@@ -1,0 +1,12 @@
+[submodule "htslib"]
+	path = htslib
+	url = https://github.com/samtools/htslib.git
+[submodule "libgab"]
+	path = libgab
+	url = https://github.com/grenaud/libgab.git
+[submodule "bamtools"]
+	path = bamtools
+	url = https://github.com/pezmaster31/bamtools.git
+[submodule "tabix"]
+	path = tabix
+	url = https://github.com/samtools/tabix.git
