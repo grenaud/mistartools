@@ -29,8 +29,7 @@ Installation
 
 2) Make sure you have Armadillo C++ library installed. On Ubuntu, just type:
 
-sudo apt-get install libarmadillo2
-sudo apt-get install libarmadillo-dev
+sudo apt-get install libarmadillo2 libarmadillo-dev
 
 3) Build the submodules and main code by typing :
     make

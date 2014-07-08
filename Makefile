@@ -102,8 +102,8 @@ closestMistar:	closestMistar.o libgab/utils.o MistarParser.o libgab//gzstream/gz
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
 
 
-bam2mistar:	bam2mistar.o libgab/utils.o  libgab//gzstream/gzstream.o   bamtools/build/src/utils/CMakeFiles/BamTools-utils.dir/*cpp.o bamtools/lib/libbamtools.a
-	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
+bam2mistar:	bam2mistar.o libgab/utils.o  libgab//gzstream/gzstream.o    bamtools/lib/libbamtools.a
+	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) bamtools/build/src/utils/CMakeFiles/BamTools-utils.dir/*cpp.o
 
 mistarmeld:	mistarmeld.o libgab/utils.o MistarParser.o libgab//gzstream/gzstream.o SingleAllele.o AlleleRecords.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS) 
