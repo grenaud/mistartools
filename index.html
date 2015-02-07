@@ -57,15 +57,58 @@ REF,ALT:CPG
 
 <p>The line above says that IndividualA had one T and one C at that position hence a heterozygous site. </p>
 
-<h3>
-<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
 
-<p>We've crafted some handsome templates for you to use. Go ahead and continue to layouts to browse through them. You can easily go back to edit your page before publishing. After publishing your page, you can revisit the page generator and switch to another theme. Your Page content will be preserved if it remained markdown format.</p>
+<p>mistartools allows users to transform genotyping data into this intermediate allele count. Data from multiple sources can be combined from multiple sources, transformed and exported to numerous formats</p>
 
 <h3>
-<a id="rather-drive-stick" class="anchor" href="#rather-drive-stick" aria-hidden="true"><span class="octicon octicon-link"></span></a>Rather Drive Stick?</h3>
+<a id="designer-templates" class="anchor" href="#designer-templates" aria-hidden="true"><span class="octicon octicon-link"></span></a>File format</h3>
 
-<p>If you prefer to not use the automatic generator, push a branch named <code>gh-pages</code> to your repository to create a page manually. In addition to supporting regular HTML content, GitHub Pages support Jekyll, a simple, blog aware static site generator written by our own Tom Preston-Werner. Jekyll makes it easy to create site-wide headers and footers without having to copy them across every page. It also offers intelligent blog support and other advanced templating features.</p>
+<p>The mistartools file can be divided into two parts, the header that details the operations that were performed and the allele count per se. Here is an example:</p>
+
+<pre><code>
+#MISTAR
+#PG:/pathtomistartools/vcf2mistar --allowall /pathtovcf/IndividualA.hg19_1000g.4.mod.vcf.gz IndividualA chr4.epo.gz 
+#GITVERSION: 8ac3cbfd59c78e74395c8accca9d174a0241ebd5
+#DATE: 2013-06-03
+#chr	coord	REF,ALT	root	anc	IndividualA
+4	72045	A,N	0,0:0	0,0:0	2,0:0
+4	72046	T,N	0,0:0	0,0:0	2,0:0
+4	72047	T,N	0,0:0	0,0:0	2,0:0
+4	72048	T,G	0,0:0	0,0:0	1,1:0
+4	72049	G,N	0,0:0	0,0:0	2,0:0
+4	72050	T,N	0,0:0	0,0:0	2,0:0
+4	72051	A,N	0,0:0	0,0:0	2,0:0
+4	72052	G,N	0,0:0	0,0:0	2,0:0
+</code></pre>
+
+<p>The header lines started with a # sign. The remaining lines contain the allele count for chromosome 4 for 8 sites. Three samples are present, the chimp allele, the chimp-human ancestor and an individual named "IndividualA". If multiple indivuals are combined, the allele count lines will appear as:</p>
+
+<pre><code>
+#chr	coord	REF,ALT	root	anc	IndividualA	IndividualB	IndividualC
+4	72045	A,N	0,0:0	0,0:0	2,0:0	2,0:0	2,0:0
+4	72046	T,N	0,0:0	0,0:0	2,0:0	2,0:0	2,0:0
+4	72047	T,N	0,0:0	0,0:0	2,0:0	2,0:0	2,0:0
+4	72048	T,G	0,0:0	0,0:0	1,1:0	1,1:0	2,0:0
+4	72049	G,N	0,0:0	0,0:0	2,0:0	2,0:0	2,0:0
+4	72050	T,N	0,0:0	0,0:0	2,0:0	2,0:0	2,0:0
+4	72051	A,N	0,0:0	0,0:0	2,0:0	2,0:0	2,0:0
+4	72052	G,N	0,0:0	0,0:0	2,0:0	2,0:0	2,0:0
+</code></pre>
+
+<h3>Input data</h3>
+
+<p>
+Data can be transformed into mistartools internal format from 
+<ul>
+<li> VCF
+<li> BAM
+<li> 23andme
+<li> AXT alignments
+</ul>
+</p>
+
+
+
 
 <h3>
 <a id="authors-and-contributors" class="anchor" href="#authors-and-contributors" aria-hidden="true"><span class="octicon octicon-link"></span></a>Authors and Contributors</h3>
