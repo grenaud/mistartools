@@ -95,6 +95,10 @@ REF,ALT:CPG
 4	72052	G,N	0,0:0	0,0:0	2,0:0	2,0:0	2,0:0
 </code></pre>
 
+<p>
+We recommend using bgzip to compress the files and index and query them using tabix from <a href="https://github.com/samtools" class="user-mention">htslib</a>.
+</p>
+
 <h3>Input data</h3>
 
 <p>
@@ -105,6 +109,32 @@ Data can be transformed into mistartools internal format from
 <li> 23andme
 <li> AXT alignments
 </ul>
+</p>
+
+
+
+
+<h3>Operations on data</h3>
+
+<p>
+Using the data in the internal format, here are examples of operations:
+<ul>
+<li> unions or intersections
+<li> meld two populations as one
+<li> force two populations to share one or all alleles
+<li> remove populations
+<li> add/remove populations
+</ul>
+
+For instance, for obtaining sites where all individuals in specific population are fixed derived the following workflow can be used:
+<ol>
+<li> transform individual VCF files into mistartools files using "vcf2mistar"
+<li> unite each individual files using "mistarintersection" 
+<li> meld all individuals into a single population using "mistarmeld"
+<li> disable sharing of alleles with the ancestor using "mistarfilter znosharing"
+</ol>
+
+
 </p>
 
 
