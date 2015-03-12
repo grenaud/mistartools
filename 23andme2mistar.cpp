@@ -331,8 +331,8 @@ int main (int argc, char *argv[]) {
 	    		altCount=1;
 	    	    }else{
 	    		//goto nextline;
-			cout<<"Error: Site not found "<<line<<"\t"<<lineFromEPO<<endl;
-
+			cerr<<"Error: Potential error in the 23 and me file where the reference allele is not there "<<line<<"\t"<<lineFromEPO<<endl; //error
+			goto nextline;
 	    	    }			
 	    	}
 	    }

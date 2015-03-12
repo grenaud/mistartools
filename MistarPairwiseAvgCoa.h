@@ -8,6 +8,8 @@
 #ifndef MistarPairwiseAvgCoa_h
 #define MistarPairwiseAvgCoa_h
 
+#include <vector>
+#include <list>
 #include <string>
 #include "ComputeAvgCoa_core.h"
 

@@ -33,11 +33,29 @@ MistarParser::MistarParser(string file,string indexForFile,string chrName,int st
     }
 
     numberOfTimesHasDataWasCalled=-1;
-    tabixMode = true;
-    textMode  = false;
+    tabixMode  = true;
+    textMode   = false;
+    stringMode = false;
 }
 
 
+MistarParser::MistarParser(const vector<string> * dataToRead_,const vector<string> & populationNames_){
+    //populationNames = populationNames_;
+    populationNames = new vector<string>( populationNames_);
+    numberPopulations = populationNames->size();
+    dataToRead      = dataToRead_;
+    header="";
+    headerNoDefline="";
+
+    numbernew=0;
+    numberdel=0;
+    dataToReadInd=0;
+    numberOfTimesHasDataWasCalled=-1;
+
+    stringMode = true;
+    tabixMode  = false;
+    textMode   = false;
+}
 
 MistarParser::MistarParser(string filename){
     header="";
@@ -76,8 +94,9 @@ MistarParser::MistarParser(string filename){
 
     numberOfTimesHasDataWasCalled=-1;
     
-    tabixMode = false;
-    textMode  = true;
+    tabixMode  = false;
+    textMode   = true;
+    stringMode = false;
 }
 
 MistarParser::~MistarParser(){
@@ -203,16 +222,14 @@ bool MistarParser::hasData(){
     }
     
     numberOfTimesHasDataWasCalled++;
-    
     //    string line;
     //if(getline ( *myFilezipped,line)){
     if(getNextLine()){
-
 	numbernew++;
 	allRecToReturn                = new AlleleRecords();
 	//	cerr<<"new "<<allRecToReturn<<endl;
 	//allRecToReturn->vectorAlleles = new vector<SingleAllele>();
-
+	// cout<<"currentline "<<currentline<<endl;
 	
 	vector<string> fields=allTokens(currentline,'\t');
 
@@ -286,11 +303,23 @@ bool MistarParser::getNextLine(){
     if(textMode){
 	return getline ( *myFilezipped,currentline);
     }
+
+    if(stringMode){
+	//cout<<dataToReadInd<<"\t"<<dataToRead->size()<<endl;
+	if(dataToReadInd<dataToRead->size()){
+	    currentline = dataToRead->at(dataToReadInd++);
+	    return true;
+	}else{
+	    return false;
+	}
+	
+    }
     
     cerr<<"Invalid state in MistarParser::getNextLine()"<<endl;
     exit(1);
     return false;
 }
+
 
 
 AlleleRecords * MistarParser::getData(){

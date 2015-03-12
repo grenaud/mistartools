@@ -74,7 +74,8 @@ int main (int argc, char *argv[]) {
 	     <<"\n\tLocation of database files:\n"	    
 	     <<externalDatabase<<endl
 	     <<sizeRegions<<endl
-	     <<selection<<endl;
+	     <<selection<<endl
+	     <<outputOpt<<endl;
 	return 1;       
     }
 

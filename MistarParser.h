@@ -72,6 +72,8 @@ class MistarParser{
     int numberOfTimesHasDataWasCalled;
     string header;
     string headerNoDefline;
+    const vector<string> * dataToRead;
+    unsigned int dataToReadInd;
 
     string defline;
     string currentline;
@@ -83,13 +85,14 @@ class MistarParser{
     void parseHeader(istream & in);
     bool getNextLine();
 
-
+    bool stringMode;
     bool tabixMode;
     bool textMode;
  public:
     MistarParser(string filename);
     MistarParser(string file,string indexForFile,string chrName,int start,int end);
-
+    MistarParser(const vector<string> * dataToRead,const vector<string> & populationNames_);
+   
     MistarParser(const MistarParser&); // not implemented
     ~MistarParser();
     bool hasData();

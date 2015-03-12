@@ -11,7 +11,7 @@
 #include <iostream>
 #include <ostream> 
 #include <math.h>
-
+#include <limits>
 //#include <iostream>
 //#include <fstream>
 using namespace std;
@@ -34,6 +34,25 @@ class AlleleCounter{
     double  highConf   (const unsigned int shortBranch,const unsigned int commonBranch) const;
     /* friend ostream & operator<<(ostream & os, const AlleleCounter & ct); */
     string getHeader(string prefixToAdd="");
+    double avgCoaRefSam () const ;
+    double avgCoaSamRef () const ;
+
+    AlleleCounter & operator+= (const AlleleCounter & other){
+	counterSame      += other.counterSame;
+	counterCommon    += other.counterCommon;
+	counterReference += other.counterReference;
+	counterSample    += other.counterSample;
+	return *this;
+    }
+
+    AlleleCounter & operator-= (const AlleleCounter & other){
+	counterSame      -= other.counterSame;
+	counterCommon    -= other.counterCommon;
+	counterReference -= other.counterReference;
+	counterSample    -= other.counterSample;
+	return *this;
+    }
+
 
     friend ostream& operator<<(ostream& os, const AlleleCounter & ct){
 	os<<ct.counterSame<<"\t"

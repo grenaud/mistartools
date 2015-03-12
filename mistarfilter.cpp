@@ -55,21 +55,21 @@ int main (int argc, char *argv[]) {
 	}else{
 	    if( string(argv[1]) == "nosharing"){
 		mode='n';
-		usage=string(string(argv[0])+" "+string(argv[1])+" [mistar file] <comma separated group 1> <comma separated group 2>\n\nDescription:\n\tThis will filter sites where individuals in population group 1 do not share at least one allele with individual in population group 2.\n\tIt requires that the allele count for every individual for both groups be non-zero.\n\tA random allele is picked (biased for allele count) for heterozygous position so do not be surprised if you get different outputs every time.\n\tIn other words, the individuals in the first group have to be all reference and the second all alternative or vice-versa.");
+		usage=string(string(argv[0])+" "+string(argv[1])+" [mistar file] [comma separated group 1] [comma separated group 2]\n\nDescription:\n\tThis will filter sites where individuals in population group 1 do not share at least one allele with individual in population group 2.\n\tIt requires that the allele count for every individual for both groups be non-zero.\n\tA random allele is picked (biased for allele count) for heterozygous position so do not be surprised if you get different outputs every time.\n\tIn other words, the individuals in the first group have to be all reference and the second all alternative or vice-versa.");
 	    }else{
 		if( string(argv[1]) == "znosharing"){
 		    mode='z';
-		    usage=string(string(argv[0])+" "+string(argv[1])+" [mistar file] <comma separated group 1> <comma separated group 2>\n\nDescription:\n\tThis will filter sites where individuals in population group 1 strickly do not share any allele with individual in population group 2.\n\tIt requires that the allele count for every individual for both groups be non-zero.\n\tPlease remember that this will exclude any hetezygous sites\n.");
+		    usage=string(string(argv[0])+" "+string(argv[1])+" [mistar file] [comma separated group 1] [comma separated group 2]\n\nDescription:\n\tThis will filter sites where individuals in population group 1 strickly do not share any allele with individual in population group 2.\n\tIt requires that the allele count for every individual for both groups be non-zero.\n\tPlease remember that this will exclude any hetezygous sites\n.");
 		    
 		}else{
 		    if( string(argv[1]) == "sharing"){
 			mode='m';
-			usage=string(string(argv[0])+" "+string(argv[1])+" [mistar file] <comma separated group 1> <comma separated group 2>\n\nDescription:\n\tThis will only retain sites where every individuals in population group 1 share the same allele(s) as every individual in population group 2.\n\tIt requires that the allele count for every individual for both groups be non-zero.\n\tA random allele is picked (biased for allele count) for heterozygous position so do not be surprised if you get different outputs every time.\n\t");
+			usage=string(string(argv[0])+" "+string(argv[1])+" [mistar file] [comma separated group 1] [comma separated group 2]\n\nDescription:\n\tThis will only retain sites where every individuals in population group 1 share the same allele(s) as every individual in population group 2.\n\tIt requires that the allele count for every individual for both groups be non-zero.\n\tA random allele is picked (biased for allele count) for heterozygous position so do not be surprised if you get different outputs every time.\n\t");
 		    }else{
 			
 			if( string(argv[1]) == "popsub"){
 			    mode='p';
-			    usage=string(string(argv[0])+" "+string(argv[1])+" [mistar file] <comma separated group to keep>\n\nDescription:\n\tThis will keep only the population specified in the list.\nPlease note that it will set the alternative allele to 'N' if no population has the alternative allele");
+			    usage=string(string(argv[0])+" "+string(argv[1])+"  [mistar file] <comma separated group to keep>\n\nDescription:\n\tThis will keep only the population specified in the list.\nPlease note that it will set the alternative allele to 'N' if no population has the alternative allele");
 			}else{
 			    
 			    if( string(argv[1]) == "removepop"){

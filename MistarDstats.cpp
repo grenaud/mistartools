@@ -150,7 +150,7 @@ void dstatsMistar(string filename){
        
    }//while the parser has data
 
-   // cout<<"done "<<endl;
+   cerr<<"done with main calculations, doing bootstraps "<<endl;
    //doing bootstraping
 
    unsigned int numberOfBootstraps=1000;
@@ -214,11 +214,11 @@ void dstatsMistar(string filename){
 			   continue;
 
 		       bool dstval = computeDstat(sampledAllele[0], //root
-					       sampledAllele[i], //derived
-					       sampledAllele[j], //ind 1
-					       sampledAllele[k], //ind 2
-					       (cpgForPop[j] || cpgForPop[k]), //only look at j and k for CpG
-					       &(dstatResultsBoot[i][j][k]) );	  
+						  sampledAllele[i], //derived
+						  sampledAllele[j], //ind 1
+						  sampledAllele[k], //ind 2
+						  (cpgForPop[j] || cpgForPop[k]), //only look at j and k for CpG
+						  &(dstatResultsBoot[i][j][k]) );	  
 		       
 		      
 		   }

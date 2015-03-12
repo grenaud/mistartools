@@ -19,10 +19,17 @@ using namespace std;
 int main (int argc, char *argv[]) {
     bool useAnc =false;
     bool useRoot=false;
+    bool onlysegsite =false;
+    bool splitpop =false;
+    bool usefreq =false;
 
     string usage=string(""+string(argv[0])+" <options> [mistar file]"+
-			"\nThis program will print the number of observed alleles for the reference and alternative alleles:\n\n"+
+			"\nThis program will print the number of observed alleles for the reference and alternative alleles\nThe left column is the reference count. The order can be changed using --useanc and --useroot options:\n\n"+
 			"\t\t"+"Options:\n"+
+			"\t\t"+"--splitpop\t\tSplit pop.\n"+
+			"\t\t"+"--freq\t\tOutput frequencies\n"+
+
+			"\t\t"+"--onlysegsite\t\tUse only segregating sites\n"+
 			"\t\t"+"--useanc\t\tUse the ancestral allele to report the frequency\n"+
 			"\t\t"+"--useroot\t\tUse the root allele to report the frequency\n");
 
@@ -38,6 +45,21 @@ int main (int argc, char *argv[]) {
     
     //starts at 1 and except the last two
     for(int i=1;i<(argc-1);i++){ 
+	if(string(argv[i]) == "--onlysegsite" ) {
+	    onlysegsite = true;
+	    continue;
+	}
+
+	if(string(argv[i]) == "--freq" ) {
+	    usefreq= true;
+	    continue;
+	}
+
+	if(string(argv[i]) == "--splitpop" ) {
+	    splitpop  = true;
+	    continue;
+	}
+
 	if(string(argv[i]) == "--useanc" ) {
 	    useAnc  = true;
 	    continue;
@@ -72,11 +94,14 @@ int main (int argc, char *argv[]) {
 	totalRecords++;
 
 	//non-seg site, no point in looking at those
-	if(!isResolvedDNA(dataRow->alt))
-	    continue;
+	if(onlysegsite)
+	    if(!isResolvedDNA(dataRow->alt))
+		continue;
 
 	unsigned int refCounter=0;
 	unsigned int altCounter=0;
+	vector< pair<unsigned int,unsigned int> > alleleC;
+
 	bool rootIsRef = false;
 	bool ancIsRef  = false;
 
@@ -118,32 +143,77 @@ int main (int argc, char *argv[]) {
 
 
 
+	if(splitpop){
+	    for(unsigned j=2;j<dataRow->vectorAlleles->size();j++){
+		alleleC.push_back( make_pair<unsigned int,unsigned int>( dataRow->vectorAlleles->at(j).getRefCount(),
+									 dataRow->vectorAlleles->at(j).getAltCount() ) );
+	    }
 
-	for(unsigned j=2;j<dataRow->vectorAlleles->size();j++){
-	    //undefined site
-	    refCounter+=dataRow->vectorAlleles->at(j).getRefCount();
-	    altCounter+=dataRow->vectorAlleles->at(j).getAltCount();	
+	    cout<<dataRow->coordinate;
+	    bool flipAlt=false;
+	    if(useRoot){
+		if(!rootIsRef)
+		    flipAlt=true;
+	    }
+	    
+	     if(useAnc){
+		if(!ancIsRef)
+		    flipAlt=true;
+	     }
+	     
+	     if(flipAlt){
+		 
+		 for(unsigned j=0;j<alleleC.size();j++){
+		     double total=1.0;
+		     if(usefreq)
+			 total= double(alleleC[j].first) + double(alleleC[j].second);
+		     cout<<"\t"<<alleleC[j].second/total<<"\t"<<alleleC[j].first/total;
+
+		 }
+		 
+	     }else{
+		 for(unsigned j=0;j<alleleC.size();j++){
+		     double total=1.0;
+		     if(usefreq)
+			 total= double(alleleC[j].first) + double(alleleC[j].second);
+		     cout<<"\t"<<alleleC[j].first/total<<"\t"<<alleleC[j].second/total;
+		     
+		 }
+	     }
+	     cout<<endl;
+	}else{
+	    for(unsigned j=2;j<dataRow->vectorAlleles->size();j++){
+		//undefined site
+		refCounter+=dataRow->vectorAlleles->at(j).getRefCount();
+		altCounter+=dataRow->vectorAlleles->at(j).getAltCount();	
+	    }
+
+	    cout<<dataRow->coordinate<<"\t";
+	    double total=1.0;
+	    if(usefreq){
+		total= double(refCounter) + double(altCounter);
+	    }
+
+	    if(useRoot){
+		if(rootIsRef)
+		    cout<<double(refCounter)/total<<"\t"<<double(altCounter)/total<<endl;
+		else
+		    cout<<double(altCounter)/total<<"\t"<<double(refCounter)/total<<endl;
+		continue;
+	    }
+
+	    if(useAnc){
+		if(ancIsRef)
+		    cout<<double(refCounter)/total<<"\t"<<double(altCounter)/total<<endl;
+		else
+		    cout<<double(altCounter)/total<<"\t"<<double(refCounter)/total<<endl;
+		continue;
+	    }
+
+	    cout<<double(refCounter)/total<<"\t"<<double(altCounter)/total<<endl;
 	}
 
 
-	cout<<dataRow->coordinate<<"\t";
-	if(useRoot){
-	    if(rootIsRef)
-		cout<<refCounter<<"\t"<<altCounter<<endl;
-	    else
-		cout<<altCounter<<"\t"<<refCounter<<endl;
-	    continue;
-	}
-
-	if(useAnc){
-	    if(ancIsRef)
-		cout<<refCounter<<"\t"<<altCounter<<endl;
-	    else
-		cout<<altCounter<<"\t"<<refCounter<<endl;
-	    continue;
-	}
-
-	cout<<refCounter<<"\t"<<altCounter<<endl;
 
     }
 

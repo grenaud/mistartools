@@ -73,3 +73,24 @@ double AlleleCounter::highConf (const unsigned int shortBranch,const unsigned in
 //     AlleleCounter al;
 //     cout<<al.lowerConf(46,396)<<endl;
 // }
+double AlleleCounter::avgCoaRefSam () const {
+
+    if( (counterReference + counterCommon) != 0){
+	return double(counterReference)/double(counterReference+counterCommon);
+    }else{
+	return std::numeric_limits<double>::infinity();
+    }    
+
+}
+
+
+
+double AlleleCounter::avgCoaSamRef () const {
+
+    if( (counterSample + counterCommon) != 0){
+	return double(counterSample)/double(counterSample+counterCommon);
+    }else{
+	return std::numeric_limits<double>::infinity();
+    }    
+
+}
