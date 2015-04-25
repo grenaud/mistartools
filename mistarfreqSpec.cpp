@@ -188,7 +188,7 @@ int main (int argc, char *argv[]) {
 		altCounter+=dataRow->vectorAlleles->at(j).getAltCount();	
 	    }
 
-	    cout<<dataRow->coordinate<<"\t";
+	    cout<<dataRow->chr<<"\t"<<dataRow->coordinate<<"\t";
 	    double total=1.0;
 	    if(usefreq){
 		total= double(refCounter) + double(altCounter);

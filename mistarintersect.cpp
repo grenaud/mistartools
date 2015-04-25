@@ -140,7 +140,7 @@ int main (int argc, char *argv[]) {
 	    }
 
 
-	    //all have add getData called, we need to reposition to the maximum coord
+	    //all have had getData called, we need to reposition to the maximum coord
 	    bool needToSetCoord=true;
 	    for(unsigned int i=0;i<vectorOfMP.size();i++){ 
 		

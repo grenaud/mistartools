@@ -5,7 +5,7 @@ LIBGAB   = libgab/
 LIBTABIX = tabix/
 BAMTOOLS = bamtools/
 
-LDFLAGS  =   ReadTabix.o  tabix/libtabix.a /usr/lib/libarmadillo.so.2    -lz -lpthread
+LDFLAGS  =   ReadTabix.o  tabix/libtabix.a /usr/lib/libarmadillo.so    -lz -lpthread
 CXXFLAGS = -Wall -lm -O3 -lz -I${LIBGAB}/   -I${LIBTABIX}   -I${LIBGAB}/gzstream/  -I${BAMTOOLS}/include/  -I${BAMTOOLS}/src/  -c
 
 all: tabix/libtabix.a bamtools/lib/libbamtools.a libgab/utils.o ReadTabix.o testNewickParser boostrapSubGroups mistar2treemix mistarcompute mistarcat  mistarintersect mistarmeld mistarunion testMistar mistarfilter mistar2AlleleMatrix epo2mistar mistaruniq ms2nj mistar2binary closestMistar replaceAncestor mistar2nexus ms2mistar mistar2bed mistarfreqSpec  testMistarTabix mistarcompress mistardecompress mpileup2mistar mistar2EIGENSTRAT mistar2BinaryPLINK mistar2segtor mistar2fasta mistarRenamePop usePopAsRootAnc mistarstats axt2mistar mistarSubsample bam2mistar vcfcompute testRandomCoordGenerator testComputation generateCoords testMS avgCoaMS testReadTabix testVCF mergeBAMTable filterVCF testReadFastq vcf2mistar bamtable2mistar 23andme2mistar testMultiReadTabix vcfMulti2mistar mistarcomputeParallel mistarcomputeParallel2
