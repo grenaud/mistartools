@@ -106,7 +106,7 @@ class mistarVisitor : public PileupVisitor {
 		cerr << "bamtools convert ERROR: pileup conversion - could not read reference base from FASTA file" << endl;
 		return;
 	    }
-
+	    referenceBase = toupper(referenceBase);
 
 	    //cout<<
 	    if(referenceBase == 'N')

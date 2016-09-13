@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 
-// #define DEBUG
+//#define DEBUG
 
 #include "utils.h"
 #include "MistarParser.h"
@@ -67,6 +67,7 @@ int main (int argc, char *argv[]) {
     vector<AlleleRecords *> vecAlleleRecords;
     string chr1;
     unsigned int coordCurrent;
+
     
     initFiles(vectorOfMP,
 	      // atLeastOneHasData,
@@ -85,7 +86,7 @@ int main (int argc, char *argv[]) {
     while(stayLoop){
 
 #ifdef DEBUG
-	cerr<<"coordCurrent "<<coordCurrent<<endl;
+	cerr<<"coordCurrent "<<chr1<<":"<<coordCurrent<<endl;
 #endif
 
 
@@ -93,7 +94,8 @@ int main (int argc, char *argv[]) {
 
 	for(unsigned int i=0;i<vectorOfMP.size();i++){ 
 	    if(hasData[i]){		
-		if(coordCurrent  != vecAlleleRecords[i]->coordinate){
+		if( (chr1          != vecAlleleRecords[i]->chr       ) ||
+		    (coordCurrent  != vecAlleleRecords[i]->coordinate) ){
 		    allHaveCoordinate=false;
 		}
 	    }else{
@@ -106,7 +108,7 @@ int main (int argc, char *argv[]) {
 	//we print
 	if(allHaveCoordinate){
 #ifdef DEBUG
-	cerr<<"same coordCurrent "<<coordCurrent<<endl;
+	cerr<<"same coordCurrent "<<chr1<<":"<<coordCurrent<<endl;
 #endif
 
 	    
@@ -143,12 +145,29 @@ int main (int argc, char *argv[]) {
 	    //all have had getData called, we need to reposition to the maximum coord
 	    bool needToSetCoord=true;
 	    for(unsigned int i=0;i<vectorOfMP.size();i++){ 
-		
+
+#ifdef DEBUG
+		cerr<<needToSetCoord<<"\t"<<i<<"\t"<<chr1<<":"<<coordCurrent<<endl;
+#endif
+
 		 if(needToSetCoord){
+		     chr1          = vecAlleleRecords[i]->chr;
 		     coordCurrent  = vecAlleleRecords[i]->coordinate;
 		     needToSetCoord=false;
 		 }else{
-		     coordCurrent  = max(coordCurrent,vecAlleleRecords[i]->coordinate);
+		     if( chr1          != vecAlleleRecords[i]->chr ){//need to skip to a new chr
+			 if(coordCurrent  > vecAlleleRecords[i]->coordinate){//the diff chr is probably a new chr
+			     chr1          = chr1;
+			     coordCurrent  = vecAlleleRecords[i]->coordinate;
+			 }
+		     }else{
+			 if( chr1          == vecAlleleRecords[i]->chr ){
+			     coordCurrent  = max(coordCurrent,vecAlleleRecords[i]->coordinate);
+			 }else{//chr1 is greater than vecAlleleRecords[i]
+			     //	we will reposition vecAlleleRecords[i] there 
+			 }
+			 
+		     }
 		 }
 
 	     }
@@ -159,21 +178,41 @@ int main (int argc, char *argv[]) {
 	     // cerr<<"Invalid state"<<endl;
 	     // return 1;  
 	    
+
+#ifdef DEBUG
+	    cerr<<"current "<<chr1<<"\t"<<coordCurrent<<endl;
+#endif
 	    
 	    for(unsigned int i=0;i<vectorOfMP.size();i++){ 
+
 #ifdef DEBUG
-		cerr<<"coord["<<i<<"] "<< vecAlleleRecords[i]->coordinate<<endl;
+		cerr<<"coord["<<i<<"] "<<vecAlleleRecords[i]->chr<<"\t"<<vecAlleleRecords[i]->coordinate<<endl;
 #endif
 
-		if(coordCurrent  < vecAlleleRecords[i]->coordinate){ //overshot , repositioning there
-		    coordCurrent = vecAlleleRecords[i]->coordinate;
+		if( ((chr1          == vecAlleleRecords[i]->chr) && (coordCurrent  < vecAlleleRecords[i]->coordinate)) ){ //overshot [i], repositioning there
+		    chr1          = vecAlleleRecords[i]->chr       ;
+		    coordCurrent  = vecAlleleRecords[i]->coordinate;
 		    continue;
 		}
 
-		if(coordCurrent == vecAlleleRecords[i]->coordinate){ //fine
+
+
+		if( chr1          != vecAlleleRecords[i]->chr         ){
+
+		    if(coordCurrent  > vecAlleleRecords[i]->coordinate)  { //the different chr is probably a new chr
+			chr1          = vecAlleleRecords[i]->chr      ;
+			coordCurrent  = vecAlleleRecords[i]->coordinate;
+			continue;
+		    }
+
 		}
 
-		if(coordCurrent >  vecAlleleRecords[i]->coordinate){ //running behind
+		if( (chr1         == vecAlleleRecords[i]->chr) &&
+		    (coordCurrent == vecAlleleRecords[i]->coordinate)){ //fine
+		}
+		    
+		if( ((chr1          != vecAlleleRecords[i]->chr) && (coordCurrent <  vecAlleleRecords[i]->coordinate))||
+		    ((chr1          == vecAlleleRecords[i]->chr) && (coordCurrent >  vecAlleleRecords[i]->coordinate)) ){ //running behind in [i]
 		    hasData[i]  =  vectorOfMP[i]->hasData();
 		    if(hasData[i]){
 			vecAlleleRecords[i] = vectorOfMP[i]->getData() ;

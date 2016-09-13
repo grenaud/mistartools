@@ -181,6 +181,7 @@ int main (int argc, char *argv[]) {
 
 	//second one has data
 	if(hasData2 &&
+	   record1->chr        == record2->chr        &&
 	   record1->coordinate == record2->coordinate ){
 	    // return 1;
 	    if(record1->chr != record2->chr ){
@@ -264,12 +265,14 @@ int main (int argc, char *argv[]) {
 
 	    
 	}
-	else{//no record in the second one
+	else{//no record in the second one or not synched
 	    
 	    //check second record
  	    if(hasData2){
 		//file 2 is behind, need to increase the 
-		if( record1->coordinate > record2->coordinate ){
+		if( (record1->chr         !=  record2->chr) ||
+		    ((record1->chr        == record2->chr) &&  ( record1->coordinate > record2->coordinate ) )
+		){
 		    hasData2 = mp2.hasData();
 		    if(hasData2){
 			record2 = mp2.getData();
