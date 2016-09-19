@@ -13,14 +13,18 @@ MultiVCFreader::MultiVCFreader(string file,string indexForFile,string chrName,in
     readAhead=indelsAhead;
     rt = new ReadTabix (file,indexForFile,chrName,start,end);
     
-
+    //    cerr<<"first const"<<endl;
     //reading header
     istringstream f (rt->getHeader());
     string line;    
     numPop=0;
     while (getline(f, line)) {
         //std::cout << line << std::endl;
-	if(strBeginsWith(line,"#CHROM")){
+	if(strBeginsWith(line,"#CHROM") 
+	   // ||
+	   // strBeginsWith(line,"#chr")
+	){
+	    
 	    vector<string> tok = allTokens(line,'\t');
 	    if(tok.size() < 10 ){
 		cerr<<"The header line"<<line<<" does not contain enough fields"<<endl;
@@ -101,7 +105,10 @@ MultiVCFreader::MultiVCFreader(string file,int indelsAhead){
 	    if(currentline.length() > 0){
 		if(currentline[0] == '#'){
 
-		    if(strBeginsWith(currentline,"#CHROM")){
+		    if(strBeginsWith(currentline,"#CHROM") 
+		       // ||
+		       // strBeginsWith(currentline,"#chr") 
+		    ){
 			haveCaptureCHROM=true;
 			vector<string> tok = allTokens(currentline,'\t');
 			if(tok.size() < 10 ){
@@ -308,6 +315,10 @@ bool MultiVCFreader::hasData(){
 		vector<string> fieldTab = allTokens(currentline,'\t');
 		CoreVCF * corevcf =  new CoreVCF(fieldTab);
 		for(int k=0;k<numPop;k++){
+#ifdef DEBUG		
+		    cout<<"field#"<<k<<" = ->"<<fieldTab[k]<<"<-"<<endl;
+#endif
+		    
 		    SimpleVCF * svcf = new  SimpleVCF (fieldTab,corevcf,k==0);
 		    svcfvec->push_back(svcf);
 		}

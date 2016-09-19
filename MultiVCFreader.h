@@ -17,6 +17,7 @@
 #include "ReadTabix.h"
 #include "AlleleInfoReader.h"
 
+//#define DEBUG
 using namespace std;
 
 //! This class is to read a simple VCF (not multi individuals)

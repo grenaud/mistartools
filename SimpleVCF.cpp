@@ -6,6 +6,8 @@
  */
 
 #include "SimpleVCF.h"
+//#define DEBUG
+
 //static unsigned int limitToReOpenFP = 200; //if the coordinate is this far away, we will re-open the file pointer
 
 SimpleVCF::SimpleVCF(string line){
@@ -44,14 +46,18 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
     // corevcf = corevcf_;
     
     int fieldIndex  = corevcf->getFieldIndexAndIncrease();
-    // cerr<<"fieldIndex "<<fieldIndex<<endl;
+#ifdef DEBUG
+    cerr<<"fieldIndex "<<fieldIndex<<endl;
+#endif
 
     //FORMAT FIELDS
     rawFormatNames  = fields[ corevcf->getFieldIndexINFO()+1 ];
     rawFormatValues = fields[fieldIndex];
 
-    // cerr<<"rawFormatNames  "<<rawFormatNames<<endl;
-    // cerr<<"rawFormatValues "<<rawFormatValues<<endl;
+#ifdef DEBUG
+    cerr<<"rawFormatNames  "<<rawFormatNames<<endl;
+    cerr<<"rawFormatValues "<<rawFormatValues<<endl;
+#endif
 
     formatFieldNames  = allTokens(rawFormatNames ,':');
     formatFieldValues = allTokens(rawFormatValues,':');
@@ -64,10 +70,10 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
 	haploidCall=false;
     }else{
 
-    if(formatFieldNames.size() != formatFieldValues.size()){
-	cerr<<"SimpleVCF: for line "<<vectorToString(fields,"\t")<<" the format field does not have as many fields as the values"<<endl;
-	exit(1);
-    }
+	if(formatFieldNames.size() != formatFieldValues.size()){
+	    //cerr<<"SimpleVCF: for line "<<vectorToString(fields,"\t")<<" the format field does not have as many fields as the values "<<formatFieldNames.size()<<" vs "<<formatFieldValues.size() <<endl;
+	    //exit(1);
+	}
 
     observedPL=false;
     observedGL=false;
@@ -90,7 +96,6 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
 	    if(formatFieldGT == "0/1"){ determinedGenotype=true; heterozygous=true;       }
 	    if(formatFieldGT == "0|1"){ determinedGenotype=true; heterozygous=true;       }
 	    if(formatFieldGT == "1|0"){ determinedGenotype=true; heterozygous=true;       }
-
 
 	    if(formatFieldGT == "1/1"){ determinedGenotype=true; homozygousALT=true;      }
 	    if(formatFieldGT == "1|1"){ determinedGenotype=true; homozygousALT=true;      }
@@ -144,15 +149,20 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
 	    //    formatFieldGT == "3/3" ||
 	       
 	       
-
 	    //    ){ determinedGenotype=true; unresolvedGT=true; 
 
 	    if(!determinedGenotype){
 		cerr<<"SimpleVCF: unable to determine genotype for line "<<vectorToString(fields,"\t")<<" field=#"<<formatFieldGT<<"#"<<endl;
 		exit(1);
 	    }
+
+	    if(formatFieldValues.size() == 1 ){//weird case where the remaining fields are missing
+		break;
+	    }
 	    continue;
 	}
+
+
 
 	if(formatFieldNames[i] == "GQ"){ 
 	    if(formatFieldValues[i] == "."){
@@ -206,7 +216,7 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
 			formatFieldPLHomoAlt2 =  int(-10.0*destringify<double>(glfields[5])); //a2-a2
 
 		    }else{
-			cerr<<"SimpleVCF: for line "<<vectorToString(fields,"\t")<<" the GL field does not have 3 or 6 fields"<<endl;
+			cerr<<"SimpleVCF: for line "<<vectorToString(glfields,"\t")<<" the GL field does not have 3 or 6 fields"<<endl;
 			exit(1);
 		    }
 		}
@@ -231,6 +241,30 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
 	    }
 
 	    formatFieldPL  = formatFieldValues[i];
+
+	    // bizarre format 
+	    // the PL are missing if we have a homo ref site.
+	    // probably will cause some reference bias
+	    // setting the PL to homo ref with infinite quality
+	    if(formatFieldPL == "0" &&
+	       formatFieldGT == "0/0"){ 
+#ifdef DEBUG
+		cerr<<"rawFormatNames  "<<rawFormatNames<<endl;
+		cerr<<"rawFormatValues "<<rawFormatValues<<endl;
+		cerr<<"unresolvedGT    "<<unresolvedGT<<endl;
+#endif
+		// exit(1);
+		formatFieldPLHomoRef =  0;
+		formatFieldPLHetero  =  32767;
+		formatFieldPLHomoAlt =  32767;
+
+		// pair<int,int> tempp = this->returnLikelyAlleleCountForRefAlt(30);
+		// cerr<<tempp.first<<endl;
+		// cerr<<tempp.second<<endl;
+
+		continue;
+	    }
+	       
 	    vector<string> plfields = allTokens(formatFieldPL,',');
 
 	    if(plfields.size() == 3){ //biallelic
@@ -252,8 +286,29 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
 		    formatFieldPLHomoAlt2 =  destringify<int>(plfields[5]); //a2-a2
 
 		}else{
-		    cerr<<"SimpleVCF: for line "<<vectorToString(fields,"\t")<<" the PL field does not have 3 or 6 fields"<<endl;
-		    exit(1);
+		    if(plfields.size() == 10){ //penta allelic
+			//according to VCF docs it has the following order  AA,AB,BB,AC,BC,CC, AD,BD,CD,DD
+			formatFieldPLHomoRef  =  destringify<int>(plfields[0]); //r-r
+			
+			formatFieldPLHetero1  =  destringify<int>(plfields[1]); //r-a1
+			formatFieldPLHomoAlt1 =  destringify<int>(plfields[2]); //a1-a1
+
+			formatFieldPLHetero2  =  destringify<int>(plfields[3]); //r-a2
+
+			formatFieldPLHetero12 =  destringify<int>(plfields[4]); //a1-a2
+			formatFieldPLHomoAlt2 =  destringify<int>(plfields[5]); //a2-a2
+
+			formatFieldPLHetero3  =  destringify<int>(plfields[6]); //r-a3
+			
+			formatFieldPLHetero13 =  destringify<int>(plfields[7]); //a1-a3
+			formatFieldPLHetero23 =  destringify<int>(plfields[8]); //a2-a3
+			
+			formatFieldPLHomoAlt3 =  destringify<int>(plfields[9]); //a1-a1
+
+		    }else{
+			cerr<<"SimpleVCF: for line = "<< corevcf->getChr()<<" "<<corevcf->getPosition()<<" "<<vectorToString(plfields,"\t")<<" the PL field does not have 3 or 6 fields"<<endl;
+			exit(1);
+		    }
 		}
 	    }
 	    continue;

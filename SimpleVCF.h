@@ -79,6 +79,12 @@ private:
     int formatFieldPLHetero12;
     int formatFieldPLHomoAlt2;
 
+    //for penta-allelic sites
+    int formatFieldPLHetero3;                        
+    int formatFieldPLHetero13;
+    int formatFieldPLHetero23;                        
+    int formatFieldPLHomoAlt3;
+    
 
     /* unsigned int position; */
     /* string    chrName; */
