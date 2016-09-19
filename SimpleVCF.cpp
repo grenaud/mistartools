@@ -173,7 +173,12 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
 		formatFieldGQ=destringify<float>(formatFieldValues[i]);
 	    } 
 	    continue; }
-	if(formatFieldNames[i] == "DP"){ indexDepth        =i; formatFieldDP=destringify<int>  (formatFieldValues[i]); continue;}
+
+	if(formatFieldNames[i] == "DP"){ 
+	    indexDepth        =i; 
+	    formatFieldDP=destringify<int>  (formatFieldValues[i]); 
+	    continue;
+	}
 
 	if(formatFieldNames[i] == "GL"){ 
 	    observedGL=true;
@@ -246,8 +251,12 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
 	    // the PL are missing if we have a homo ref site.
 	    // probably will cause some reference bias
 	    // setting the PL to homo ref with infinite quality
-	    if(formatFieldPL == "0" &&
-	       formatFieldGT == "0/0"){ 
+	    // when there is no alt with samtools, no PL field are reported
+	    if( (formatFieldPL == "0" &&
+		 formatFieldGT == "0/0" )
+		||
+		(corevcf_->getAlt()  == ".")
+	    ){ 
 #ifdef DEBUG
 		cerr<<"rawFormatNames  "<<rawFormatNames<<endl;
 		cerr<<"rawFormatValues "<<rawFormatValues<<endl;

@@ -53,11 +53,13 @@ bool passedFilters(SimpleVCF * smvcf,const SetVCFFilters * filtersToUse){
     //           FILTERING INDELS AND UNDEFINED REF ALLELE         //
     /////////////////////////////////////////////////////////////////
     
-
     if(!smvcf->isResolvedSingleBasePairREF()){ rejectREFValidREF++; 
 	return false; }  //REF al  
-    if(!smvcf->isResolvedSingleBasePairALT()){ rejectREFValidALT++; 
-	return false;  } //ALT al
+
+    if(!smvcf->isResolvedSingleBasePairALT()){ 
+	rejectREFValidALT++; 
+	return false;  
+    } //ALT al
 
 
     bool notFoundNonindel=smvcf->containsIndel() ;
@@ -102,7 +104,11 @@ bool passedFilters(SimpleVCF * smvcf,const SetVCFFilters * filtersToUse){
 
     // - are in the 2.5% tails of the coverage distribution
     int coverageREF=smvcf->getDepth();
-
+    //cerr<<"coverageREF\t"<<coverageREF<<endl;
+    if(coverageREF == -1){
+	coverageREF=smvcf->getDepthInfo();
+    }
+    //cerr<<"coverageREF\t"<<coverageREF<<endl;
     if(coverageREF < filtersToUse->getMinCovcutoff() ||
        coverageREF > filtersToUse->getMaxCovcutoff() ){
 	rejectLOWCOV_REF++;
@@ -113,8 +119,12 @@ bool passedFilters(SimpleVCF * smvcf,const SetVCFFilters * filtersToUse){
 
 
 
-    // - have GQ < X				
-    if(smvcf->getGenotypeQual() < filtersToUse->getMinGQcutoff() ){
+    // - have GQ < X	
+    //cerr<<"qual "<<smvcf->getGenotypeQual()<<endl;
+    
+    if( (smvcf->getGenotypeQual()!=-1)
+	&&
+	(smvcf->getGenotypeQual() < filtersToUse->getMinGQcutoff()) ){
 	rejectLOWQUAL++;
 	return false;
     }
