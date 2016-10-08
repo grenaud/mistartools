@@ -161,8 +161,8 @@ int main (int argc, char *argv[]) {
     AlleleRecords * record2 = mp2.getData();
 
     if(record1->chr != record2->chr ){
-	cerr<<"Chromosomes differ between "<<*record1<<" and "<<*record2<<endl;
-	return 1;
+	cerr<<"Warning: Initial chromosomes differ between "<<*record1<<" and "<<*record2<<", make sure it is the correct species/genome build"<<endl;
+	//return 1;
     }
 
     // unsigned int coordCurrent=min( record1->coordinate,
@@ -265,18 +265,27 @@ int main (int argc, char *argv[]) {
 
 	    
 	}
+	//closes
+	// hasData2 &&
+	//    record1->chr        == record2->chr        &&
+	//    record1->coordinate == record2->coordinate )
 	else{//no record in the second one or not synched
 	    
 	    //check second record
  	    if(hasData2){
 		//file 2 is behind, need to increase the 
-		if( (record1->chr         !=  record2->chr) ||
+		if( (record1->chr         >  record2->chr) ||
 		    ((record1->chr        == record2->chr) &&  ( record1->coordinate > record2->coordinate ) )
 		){
 		    hasData2 = mp2.hasData();
 		    if(hasData2){
 			record2 = mp2.getData();
-		    }	    
+		    }
+		    //BEGIN TODELETE
+		    // if( (record2->coordinate%100000) == 0){
+		    // 	cerr<<"file 2 is behind "<<record2->chr<<":"<<record2->coordinate<<endl;			
+		    // }
+		    //END TODELETE
 		    continue;//next iteration
 		}
 		    

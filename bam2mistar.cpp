@@ -121,7 +121,8 @@ class mistarVisitor : public PileupVisitor {
 		rtEPO = new ReadTabix( epoFile.c_str()  , 
 				       epoFileidx.c_str()  , 
 				       m_references[pileupData.RefId].RefName,
-				       posAlignInt,INT_MAX ); //the destructor should be called automatically
+				       posAlignInt,
+				       INT_MAX ); //the destructor should be called automatically
 		setVarsEPO(rtEPO,epoChr,epoCoord,cpgEPO,allel_chimp,allel_anc,lineLeftEPO,lineFromEPO);
 	    }
 
@@ -131,8 +132,16 @@ class mistarVisitor : public PileupVisitor {
 	    }
 
 	    if(epoChr != m_references[pileupData.RefId].RefName){
-		cerr<<"Error, the chromosome does not match the one in the EPO file = "<<epoChr <<" and not "<<m_references[pileupData.RefId].RefName<<endl;
-		exit(1);
+		//cerr<<"Error, the chromosome does not match the one in the EPO file = "<<epoChr <<" and not "<<m_references[pileupData.RefId].RefName<<endl;
+		//exit(1);
+		//try to reposition
+		rtEPO->repositionIterator(m_references[pileupData.RefId].RefName  , posAlignInt,INT_MAX);
+		setVarsEPO(rtEPO,epoChr,epoCoord,cpgEPO,allel_chimp,allel_anc,lineLeftEPO,lineFromEPO);
+		if(epoChr != m_references[pileupData.RefId].RefName){
+		    cerr<<"Error, the repositioning did not work, the chromosome does not match the one in the EPO file = "<<epoChr <<" and not "<<m_references[pileupData.RefId].RefName<<endl;
+		    exit(1);
+		}
+		
 	    }
 
 
