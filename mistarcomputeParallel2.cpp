@@ -175,6 +175,7 @@ void *mainContaminationThread(void * argc){
 
 	statComputer->computeStatSingle(currentRecord,allowUndefined);
 
+	//cout<<test->print()<<endl;
     }
     //cout<<"Thread #"<<rankThread <<" read "<<count<<" records "<<results->size()<<endl;
 
@@ -459,12 +460,13 @@ void parallelP<STAT>::launchThreads(string filename,int numberOfThreads,int size
 	    // cout<<"done dd2"<<endl;
 	}
 
-	// for (unsigned int i=0; i<results->size() ; ++i) {    
-	//     // cout<<i<<"\n#####\n"<<endl;
-	//     //	cout<<results->at(i)<<endl;
-	//     //cout<<results->at(i)->print()<<endl;
-	//     //	cout<<i<<"\n#####\n"<<endl;
-	// }
+	for (unsigned int i=0; i<results->size() ; ++i) {    
+	    // cout<<i<<"\n#####\n"<<endl;
+	    //	cout<<results->at(i)<<endl;
+	    cout<<"---------------------------"<<endl;
+	    cout<<results->at(i)->print()<<endl;
+	    //	cout<<i<<"\n#####\n"<<endl;
+	}
 
 	for (unsigned int i=0; i<results->size() ; ++i) {    
 	    STAT * test =new STAT (*allResults); //creating a copy

@@ -155,19 +155,40 @@ int main (int argc, char *argv[]) {
 		     coordCurrent  = vecAlleleRecords[i]->coordinate;
 		     needToSetCoord=false;
 		 }else{
-		     if( chr1          != vecAlleleRecords[i]->chr ){//need to skip to a new chr
-			 if(coordCurrent  > vecAlleleRecords[i]->coordinate){//the diff chr is probably a new chr
-			     chr1          = chr1;
-			     coordCurrent  = vecAlleleRecords[i]->coordinate;
+		     int chrcmp = compare2Chrs(chr1, vecAlleleRecords[i]->chr);
+
+		     if(chrcmp != 0){//chromosomes are not equal
+
+			 if(chrcmp == -1){ //chr1 < vecAlleleRecords[i]->chr
+			     chr1          = vecAlleleRecords[i]->chr;
+			     coordCurrent  = vecAlleleRecords[i]->coordinate;			     
 			 }
-		     }else{
-			 if( chr1          == vecAlleleRecords[i]->chr ){
-			     coordCurrent  = max(coordCurrent,vecAlleleRecords[i]->coordinate);
-			 }else{//chr1 is greater than vecAlleleRecords[i]
-			     //	we will reposition vecAlleleRecords[i] there 
+
+			 if(chrcmp ==  1){ // chr1 > vecAlleleRecords[i]->chr
+			      // chr1          = chr1;
+			      // coordCurrent  = vecAlleleRecords[i]->coordinate;
 			 }
+
 			 
+
+		     }else{
+			 coordCurrent  = max(coordCurrent,vecAlleleRecords[i]->coordinate); //chromosomes are equal, jump to the max
 		     }
+
+
+		     // if( chr1          != vecAlleleRecords[i]->chr ){//need to skip to a new chr
+		     // 	 if(coordCurrent  > vecAlleleRecords[i]->coordinate){//the diff chr is probably a new chr
+		     // 	     chr1          = chr1;
+		     // 	     coordCurrent  = vecAlleleRecords[i]->coordinate;
+		     // 	 }
+		     // }else{
+		     // 	 if( chr1          == vecAlleleRecords[i]->chr ){
+		     // 	     coordCurrent  = max(coordCurrent,vecAlleleRecords[i]->coordinate);
+		     // 	 }else{//chr1 is greater than vecAlleleRecords[i]
+		     // 	     //	we will reposition vecAlleleRecords[i] there 
+		     // 	 }
+			 
+		     // }
 		 }
 
 	     }
@@ -189,30 +210,39 @@ int main (int argc, char *argv[]) {
 		cerr<<"coord["<<i<<"] "<<vecAlleleRecords[i]->chr<<"\t"<<vecAlleleRecords[i]->coordinate<<endl;
 #endif
 
-		if( ((chr1          == vecAlleleRecords[i]->chr) && (coordCurrent  < vecAlleleRecords[i]->coordinate)) ){ //overshot [i], repositioning there
+		//record [i] is ahead, re-position there
+		if( ((chr1          == vecAlleleRecords[i]->chr) && 
+		     (coordCurrent  < vecAlleleRecords[i]->coordinate)) ){ //overshot [i], repositioning there
 		    chr1          = vecAlleleRecords[i]->chr       ;
 		    coordCurrent  = vecAlleleRecords[i]->coordinate;
 		    continue;
 		}
 
+		int chrcmp = compare2Chrs(chr1, vecAlleleRecords[i]->chr);
 
+		//record [i] is ahead, re-position there
+		if( chrcmp  ==  -1    ){// chr1 < vecAlleleRecords[i]->chr
+		//if( chr1          != vecAlleleRecords[i]->chr         ){// chr1 < vecAlleleRecords[i]->chr
 
-		if( chr1          != vecAlleleRecords[i]->chr         ){
-
-		    if(coordCurrent  > vecAlleleRecords[i]->coordinate)  { //the different chr is probably a new chr
-			chr1          = vecAlleleRecords[i]->chr      ;
-			coordCurrent  = vecAlleleRecords[i]->coordinate;
-			continue;
-		    }
+		    //if(coordCurrent  > vecAlleleRecords[i]->coordinate)  { //the different chr is probably a new chr
+		    chr1          = vecAlleleRecords[i]->chr      ;
+		    coordCurrent  = vecAlleleRecords[i]->coordinate;
+		    continue;
+		    //}
 
 		}
 
-		if( (chr1         == vecAlleleRecords[i]->chr) &&
+		//if( (chr1         == vecAlleleRecords[i]->chr) &&
+		//in sync
+		if( (chrcmp        == 0) &&
 		    (coordCurrent == vecAlleleRecords[i]->coordinate)){ //fine
 		}
 		    
-		if( ((chr1          != vecAlleleRecords[i]->chr) && (coordCurrent <  vecAlleleRecords[i]->coordinate))||
-		    ((chr1          == vecAlleleRecords[i]->chr) && (coordCurrent >  vecAlleleRecords[i]->coordinate)) ){ //running behind in [i]
+		//if( ((chr1          != vecAlleleRecords[i]->chr) && (coordCurrent <  vecAlleleRecords[i]->coordinate)) 
+		//record [i] is running behind 
+		if( (chrcmp == 1)  // chr1 > vecAlleleRecords[i]->chr
+		    ||
+		    ((chr1          == vecAlleleRecords[i]->chr) && (coordCurrent >  vecAlleleRecords[i]->coordinate)) ){ 
 		    hasData[i]  =  vectorOfMP[i]->hasData();
 		    if(hasData[i]){
 			vecAlleleRecords[i] = vectorOfMP[i]->getData() ;

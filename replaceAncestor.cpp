@@ -274,7 +274,11 @@ int main (int argc, char *argv[]) {
 	    //check second record
  	    if(hasData2){
 		//file 2 is behind, need to increase the 
-		if( (record1->chr         >  record2->chr) ||
+		int chrcmp = compare2Chrs(record1->chr,record2->chr);
+		//chr1, vecAlleleRecords[i]->chr);
+
+		//if( (record1->chr         >  record2->chr) ||
+		if(  (chrcmp == 1) ||
 		    ((record1->chr        == record2->chr) &&  ( record1->coordinate > record2->coordinate ) )
 		){
 		    hasData2 = mp2.hasData();

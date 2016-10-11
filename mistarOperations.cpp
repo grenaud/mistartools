@@ -93,7 +93,7 @@ void initFiles(vector<MistarParser * > & vectorOfMP,
 	    coordCurrent  = vecAlleleRecords[i]->coordinate;
 	}else{
 	    if(chr1 != vecAlleleRecords[i]->chr ){
-		cerr<<"Chromosomes differ between "<<chr1<<" and "<< vecAlleleRecords[i]->chr <<endl;
+		cerr<<"initFiles() Chromosomes differ between "<<chr1<<" and "<< vecAlleleRecords[i]->chr <<endl;
 		exit(1);    	
 	    }
 	    coordCurrent  = min(coordCurrent,vecAlleleRecords[i]->coordinate);
@@ -120,13 +120,13 @@ bool sanityCheck(vector<MistarParser * > & vectorOfMP,
 		chrcheck   = vecAlleleRecords[i]->chr;
 		refAllele  = vecAlleleRecords[i]->ref;
 		if( chrcheck   != chr1){
-		    cerr<<"Chromosomes differ between "<<(* vecAlleleRecords[0])<<" and "<<(*vecAlleleRecords[i])<<endl;
+		    cerr<<"sanityCheck()1 Chromosomes differ between "<<(* vecAlleleRecords[0])<<" and "<<(*vecAlleleRecords[i])<<endl;
 		    exit(1);   
 		}
 
 	    }else{
 		if( chrcheck   != vecAlleleRecords[i]->chr){
-		    cerr<<"Chromosomes differ between "<<(* vecAlleleRecords[0])<<" and "<<(*vecAlleleRecords[i])<<endl;
+		    cerr<<"sanityCheck()2 Chromosomes differ between "<<(* vecAlleleRecords[0])<<" and "<<(*vecAlleleRecords[i])<<endl;
 		    exit(1);   
 		}
 

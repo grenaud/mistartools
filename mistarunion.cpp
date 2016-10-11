@@ -8,7 +8,7 @@
 #include <iostream>
 #include <fstream>
 
-// #define DEBUG
+//#define DEBUG
 
 #include "utils.h"
 #include "MistarParser.h"
@@ -92,7 +92,7 @@ int main (int argc, char *argv[]) {
 	}
 
 #ifdef DEBUG
-	cerr<<"coordCurrent "<<coordCurrent<<endl;
+	cerr<<"coordCurrent "<<chr1<<"\t"<<coordCurrent<<endl;
 #endif
 
 	vector<bool> hasCoordinate (vectorOfMP.size(),false);
@@ -150,15 +150,37 @@ int main (int argc, char *argv[]) {
 		 continue;
 
 	     //coordCurrent=0;
+	     //Try to find the record that is the most behind
 	     bool needToSetCoord=true;
 	     for(unsigned int i=0;i<vectorOfMP.size();i++){ 
 
 		if(hasData[i]  ){		    
 		    if(needToSetCoord){
+
+			chr1          = vecAlleleRecords[i]->chr;
 			coordCurrent  = vecAlleleRecords[i]->coordinate;
+
 			needToSetCoord=false;
 		    }else{
-			coordCurrent  = min(coordCurrent,vecAlleleRecords[i]->coordinate);
+			if(chr1 == vecAlleleRecords[i]->chr){
+			    coordCurrent  = min(coordCurrent,vecAlleleRecords[i]->coordinate);
+			}else{
+
+			    int chrcmp = compare2Chrs(chr1, vecAlleleRecords[i]->chr);
+			    if(chrcmp == -1){// the current record is ahead, do nothing
+				
+				
+			    }else{
+				if(chrcmp== 1){ //the current record is behind chromosome-wise, reposition there.
+				    chr1          = vecAlleleRecords[i]->chr;
+				    coordCurrent  = vecAlleleRecords[i]->coordinate;
+
+				}else{
+				    cerr<<"Invalid state"<<endl;
+				    return 1;  				    
+				}
+			    }
+			}
 		    }
 		    // if(i==0){
 		    // 	coordCurrent  = vecAlleleRecords[i]->coordinate;
@@ -170,10 +192,9 @@ int main (int argc, char *argv[]) {
 
 	    continue;
 
-	}else{
+	}else{//not at least one has coordinate
 	     cerr<<"Invalid state"<<endl;
 	     return 1;  
-
 	}
 
 	
