@@ -315,7 +315,17 @@ void SimpleVCF::init(const vector<string> & fields, CoreVCF *  corevcf_){ //stri
 			formatFieldPLHomoAlt3 =  destringify<int>(plfields[9]); //a1-a1
 
 		    }else{
-			cerr<<"SimpleVCF: for line = "<< corevcf->getChr()<<" "<<corevcf->getPosition()<<" "<<vectorToString(plfields,"\t")<<" the PL field does not have 3 or 6 fields"<<endl;
+			//to take care of such things:
+			//chr17	55936366	.	N	A,C,T,G	19	q:30	DP=12;VDB=8.329641e-02;AF1=1;AC1=2;DP4=0,0,1,6;MQ=36;FQ=-36	GT:PL:GQ	1/1:63,21,12,51,0,45,58,10,42,55,58,10,42,50,55:15
+			if(plfields.size() == 15){
+			    unresolvedGT=true; 
+			    observedPL=false;
+			    observedGL=false;
+			    haploidCall=false;
+			    return;
+			}
+
+			cerr<<"SimpleVCF: for line = "<< corevcf->getChr()<<" "<<corevcf->getPosition()<<" "<<vectorToString(plfields,"\t")<<" the PL field does not have 3,6 or 10 fields, has "<<plfields.size()<<" fields"<<endl;
 			exit(1);
 		    }
 		}
