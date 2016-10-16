@@ -65,3 +65,14 @@ DstatCounter &  DstatCounter::operator+=(const DstatCounter & other){
 
     return *this;
 }
+
+
+DstatCounter &  DstatCounter::operator-=(const DstatCounter & other){
+    this->counterAncAnc -= other.counterAncAnc;
+    this->counterAncDer -= other.counterAncDer;
+    this->counterDerAnc -= other.counterDerAnc;
+    this->counterDerDer -= other.counterDerDer;
+
+
+    return *this;
+}

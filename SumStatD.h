@@ -7,21 +7,22 @@
 
 #ifndef SumStatD_h
 #define SumStatD_h
-#include "ComputeAvgCoa_core.h"
+#include "Dstat_core.h"
 #include "AlleleRecords.h"
 
-#include "AvgCoaResult.h"
+#include "DstatResult.h"
 
 using namespace std;
 
 class SumStatD{
  private:
-    AvgCoaResult  ** divergenceResults;//[numberOfPopulations][numberOfPopulations];
+    //AvgCoaResult  ** divergenceResults;//[numberOfPopulations][numberOfPopulations];
+    DstatResult *** dstatResults;//[numberOfPopulations][numberOfPopulations];
     unsigned int numberOfPopulations;
 
  public:
     vector<string> * populationNames ;
-    AvgCoaResult const * const * getAvgCoaResult() const;
+    DstatResult const * const * const * getDstatResult() const;
     
     SumStatD();
     SumStatD(const vector<string> * popNames);
@@ -47,20 +48,15 @@ class SumStatD{
 
 	for(unsigned i=0;i<numberOfPopulations;i++){
 	    for(unsigned j=0;j<numberOfPopulations;j++){	       
-	   
-		divergenceResults[i][j]+=other.divergenceResults[i][j];
-
+		for(unsigned k=0;k<numberOfPopulations;k++){	       
+		    dstatResults[i][j][k]+=other.dstatResults[i][j][k];
+		}
 	    }
 	}
 
 	return *this;
     }
 
-    /* SumStatD operator-(const SumStatD & s1){ */
-    /* 	SumStatD toReturn (s1); */
-    /* 	//toReturn=-s2; */
-    /* 	return toReturn; */
-    /* } */
 
     SumStatD & operator-= (const SumStatD & other){
 	if(other.numberOfPopulations != numberOfPopulations){
@@ -80,9 +76,9 @@ class SumStatD{
 
 	for(unsigned i=0;i<numberOfPopulations;i++){
 	    for(unsigned j=0;j<numberOfPopulations;j++){	       
-		
-		divergenceResults[i][j]-=other.divergenceResults[i][j];
-
+		for(unsigned k=0;k<numberOfPopulations;k++){	       
+		    dstatResults[i][j][k]-=other.dstatResults[i][j][k];
+		}
 	    }
 	}
 	
@@ -90,8 +86,8 @@ class SumStatD{
     }
 
     //void computeStat(    vector < AlleleRecords * >  * dataToUse,vector<string> & popNames,bool allowUndefined);
-    void computeStat( const   vector < AlleleRecords  >  * dataToUse,const vector<string> * popNames,bool allowUndefined);
-    void computeStatSingle( const   AlleleRecords   * recordToUse,const bool allowUndefined);
+    void computeStat(       const   vector < AlleleRecords  >  * dataToUse,const vector<string> * popNames,bool allowUndefined);
+    void computeStatSingle( const   AlleleRecords   * recordToUse                                         ,const bool allowUndefined);
 
     string print() const;
     string printWithBootstraps(const   vector<SumStatD *> * bootstr) const;
@@ -102,4 +98,5 @@ class SumStatD{
     }
 
 };
+
 #endif

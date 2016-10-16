@@ -24,16 +24,36 @@ SumStatD::SumStatD(const SumStatD & other){
 	// cout<<"copyNames "<< other.populationNames->at(i) <<endl;
     }
 
-    divergenceResults = new AvgCoaResult*[numberOfPopulations];
+
+    dstatResults = new DstatResult**[numberOfPopulations];
     for(unsigned int i=0;i<numberOfPopulations;i++)
-	divergenceResults[i] = new AvgCoaResult[numberOfPopulations];
+     	dstatResults[i] = new DstatResult*[numberOfPopulations];
 
     for(unsigned i=0;i<numberOfPopulations;i++){
-	for(unsigned j=0;j<numberOfPopulations;j++){	       	    
-	    divergenceResults[i][j]=other.divergenceResults[i][j];	    
-	    // cout<<"copy "<<divergenceResults[i][j]<<endl;
-	}
+    	for(unsigned j=0;j<numberOfPopulations;j++){	       	    
+    	    dstatResults[i][j] == new DstatResult[numberOfPopulations];	    
+    	}
     }
+
+    for(unsigned i=0;i<numberOfPopulations;i++){
+    	for(unsigned j=0;j<numberOfPopulations;j++){	       	    
+	    for(unsigned k=0;k<numberOfPopulations;k++){	       	    
+		dstatResults[i][j][k] == other.dstatResults[i][j][k];	    
+	    }
+    	}
+    }
+
+
+    // divergenceResults = new AvgCoaResult*[numberOfPopulations];
+    // for(unsigned int i=0;i<numberOfPopulations;i++)
+    // 	divergenceResults[i] = new AvgCoaResult[numberOfPopulations];
+
+    // for(unsigned i=0;i<numberOfPopulations;i++){
+    // 	for(unsigned j=0;j<numberOfPopulations;j++){	       	    
+    // 	    divergenceResults[i][j]=other.divergenceResults[i][j];	    
+    // 	    // cout<<"copy "<<divergenceResults[i][j]<<endl;
+    // 	}
+    // }
     // cout<<"copy"<<endl;
 }
 
@@ -41,11 +61,22 @@ SumStatD::SumStatD(const SumStatD & other){
 SumStatD::SumStatD(const vector<string> * popNames){
 
     numberOfPopulations=popNames->size()+1;//+1 for the human reference
-    divergenceResults = new AvgCoaResult*[numberOfPopulations];
-    for(unsigned int i=0;i<numberOfPopulations;i++)
-	divergenceResults[i] = new AvgCoaResult[numberOfPopulations];
+    // divergenceResults = new AvgCoaResult*[numberOfPopulations];
+    // for(unsigned int i=0;i<numberOfPopulations;i++)
+    // 	divergenceResults[i] = new AvgCoaResult[numberOfPopulations];
+    // //[numberOfPopulations][numberOfPopulations];
 
-    //[numberOfPopulations][numberOfPopulations];
+
+    dstatResults = new DstatResult**[numberOfPopulations];
+    for(unsigned int i=0;i<numberOfPopulations;i++)
+     	dstatResults[i] = new DstatResult*[numberOfPopulations];
+
+    for(unsigned i=0;i<numberOfPopulations;i++){
+    	for(unsigned j=0;j<numberOfPopulations;j++){	       	    
+    	    dstatResults[i][j] == new DstatResult[numberOfPopulations];	    
+    	}
+    }
+
 
     populationNames = new vector<string>();
     for(unsigned int i=0;i<popNames->size();i++){
@@ -63,15 +94,23 @@ SumStatD::~SumStatD(){
     // cout<<"destructor#1"<<endl;
     delete(populationNames);
     //cout<<"destructor#2"<<endl;
+    //cout<<"destructor #"<<i<<endl;
+
     for(unsigned int i=0;i<numberOfPopulations;i++){
-	//cout<<"destructor #"<<i<<endl;
-	delete [] divergenceResults[i];
+	for(unsigned int j=0;j<numberOfPopulations;j++){
+	    delete [] dstatResults[i][j];
+	}
     }
-    delete [] divergenceResults;
+
+    for(unsigned int i=0;i<numberOfPopulations;i++){
+	delete [] dstatResults[i];
+    }
+
+    delete [] dstatResults;
 }
 
-AvgCoaResult const * const *  SumStatD::getAvgCoaResult() const{
-    return divergenceResults;
+DstatResult const * const * const * SumStatD::getDstatResult() const{
+    return dstatResults;
 }
 
 string SumStatD::printWithBootstraps(const   vector<SumStatD *> * jackVec) const{ //all boostraps or jacknife
@@ -86,20 +125,30 @@ string SumStatD::printWithBootstraps(const   vector<SumStatD *> * jackVec) const
 	   if(i==j)
 	       continue;	   
 
-	    vector< const AvgCoaResult * > jacknivesToSend;
-	    for(unsigned k=0;k<jackVec->size();k++){	       
-		const AvgCoaResult * const* temsp= (jackVec->at(k)->getAvgCoaResult());
-		//constAvgCoaResult
-		//cout<<temsp[i][j]<<endl;
-		//const AvgCoaResult * test1  = &temsp[i][j];
-		//jacknivesToSend.push_back( &(  (jackVec->at(k)->getAvgCoaResult())[i][j]) );
-		jacknivesToSend.push_back( &( temsp[i][j] ) );
-	    }
-	    toReturn<<populationNames->at(i)<<"-"<<populationNames->at(j)<<"\t"<<divergenceResults[i][j].printWithJacknife( &jacknivesToSend )<<endl;
-	}
-      }
+	   for(unsigned k=2;k<numberOfPopulations;k++){	       
+	       //skip when the population is identical
+	       if(i==k)
+		   continue;	   
+	       if(j==k)
+		   continue;	   
 
-      return toReturn.str();
+	       vector< const DstatResult * > jacknivesToSend;
+	       for(unsigned l=0;l<jackVec->size();l++){	       
+		   const DstatResult * const* temsp= (jackVec->at(l)->getDstatResult());
+		   //constAvgCoaResult
+		   //cout<<temsp[i][j]<<endl;
+		   //const AvgCoaResult * test1  = &temsp[i][j];
+		   //jacknivesToSend.push_back( &(  (jackVec->at(k)->getAvgCoaResult())[i][j]) );
+		   jacknivesToSend.push_back( &( temsp[i][j] ) );
+	       }
+	       //toReturn<<populationNames->at(i)<<"-"<<populationNames->at(j)<<"-"<<populationNames->at(k)<<"\t"<<divergenceResults[i][j][k].printWithJacknife( &jacknivesToSend )<<endl;
+               toReturn<<populationNames->at(j)<<"-"<<populationNames->at(k)<<"@"<< populationNames->at(i)  <<"\t"<<dstatResults[i][j][k].printWithJacknife( &jacknivesToSend )<<endl;
+
+	   }//k
+	}//j
+    }//i
+
+    return toReturn.str();
     
 }
 
@@ -109,7 +158,7 @@ void SumStatD::computeStatSingle( const   AlleleRecords   * recordToUse,const bo
     //cout<<"coord1 "<<dataToUse->at(d).coordinate<<" "<<d<<" "<<dataToUse->at(d) <<endl;
        
     if(!isResolvedDNA(recordToUse->ref) ){
-	cerr<<"MistarPairwiseAvgCoa.cpp  pairwiseAvgCoa() Problem for record #"<<"\t"<<recordToUse->chr<<" coordinate = "<<recordToUse->coordinate<<" reference = "<<recordToUse->ref<<" is not resolved"<<endl;
+	cerr<<"SumStatD  computeStatSingle() Problem for record #"<<"\t"<<recordToUse->chr<<" coordinate = "<<recordToUse->coordinate<<" reference = "<<recordToUse->ref<<" is not resolved"<<endl;
 	exit(1);
     }
 
@@ -125,7 +174,7 @@ void SumStatD::computeStatSingle( const   AlleleRecords   * recordToUse,const bo
 
     //double check, already checked in MistarParser 
     if(recordToUse->vectorAlleles->size() != (numberOfPopulations-1)){
-	cerr<<"MistarPairwiseAvgCoa.cpp  pairwiseAvgCoa() Problem for line "<<recordToUse->chr<<" "<<recordToUse->coordinate<<" wrong number of columns"<<endl;
+	cerr<<"SumStatD.cpp  computeStatSingle() Problem for line "<<recordToUse->chr<<" "<<recordToUse->coordinate<<" wrong number of columns"<<endl;
 	exit(1);
     }
 
@@ -189,36 +238,57 @@ void SumStatD::computeStatSingle( const   AlleleRecords   * recordToUse,const bo
 	    //skip when the allele is identical
 	    if(i==j)
 		continue;
+
+	    for(unsigned k=2;k<numberOfPopulations;k++){	       
+		//skip when the allele is identical
+		if(i==k)
+		    continue;
+		if(j==k)
+		    continue;
 	       	      
 
-	    if(allowUndefined){//if one has undefined allele
-		if(sampledAllele[i] == 'N')
-		    continue;
-		if(sampledAllele[j] == 'N')
-		    continue;
-	    }
-
-	    computeDiv(sampledAllele[1], //0 is root, 1 is ancestral
-		       sampledAllele[i],
-		       sampledAllele[j],
-		       (cpgForPop[i] || cpgForPop[j]),
-		       &(divergenceResults[i][j])  );
-	       
-	}
-    }
+		if(allowUndefined){//if one has undefined allele
+		    if(sampledAllele[i] == 'N')
+			continue;
+		    if(sampledAllele[j] == 'N')
+			continue;
+		    if(sampledAllele[k] == 'N')
+			continue;
+		}
+		//bool dstval = computeDstat(sampledAllele[0], //root
+		computeDstat(sampledAllele[0], //root
+			     sampledAllele[i], //derived
+			     sampledAllele[j], //ind 1
+			     sampledAllele[k], //ind 2
+			     (cpgForPop[j] || cpgForPop[k]), //only look at j and k for CpG
+			     &(dstatResults[i][j][k]) );
+		
+		// computeDiv(sampledAllele[1], //0 is root, 1 is ancestral
+		// 	   sampledAllele[i],
+		// 	   sampledAllele[j],
+		// 	   (cpgForPop[i] || cpgForPop[j]),
+		// 	   &(divergenceResults[i][j])  );
+	    }//k
+	}//j
+    }//i
 
     //SKIPTONEXTITERATION:
     return;
-    
 }
+
 
 
 
 void SumStatD::computeStat( const   vector < AlleleRecords >  * dataToUse,const vector<string> * popNames,const bool allowUndefined){
     numberOfPopulations=popNames->size()+1;//+1 for the human reference
-    divergenceResults = new AvgCoaResult*[numberOfPopulations];
+    dstatResults = new DstatResult**[numberOfPopulations];
+
     for(unsigned int i=0;i<numberOfPopulations;i++)
-	divergenceResults[i] = new AvgCoaResult[numberOfPopulations];
+	dstatResults[i] = new DstatResult*[numberOfPopulations];
+
+    for(unsigned int i=0;i<numberOfPopulations;i++)
+	for(unsigned int j=0;j<numberOfPopulations;j++)
+	    dstatResults[i][j] = new DstatResult[numberOfPopulations];
 
     //[numberOfPopulations][numberOfPopulations];
 
@@ -245,7 +315,6 @@ void SumStatD::computeStat( const   vector < AlleleRecords >  * dataToUse,const 
 
 }
 
-
 string SumStatD::print() const {
     // cout<<"print() begin"<<endl;
     stringstream toReturn;
@@ -254,7 +323,16 @@ string SumStatD::print() const {
 	   //skip when the population is identical
 	   if(i==j)
 	       continue;	   
-	   toReturn<<populationNames->at(i)<<"-"<<populationNames->at(j)<<"\t"<<divergenceResults[i][j]<<endl;
+	    for(unsigned k=2;k<numberOfPopulations;k++){	       
+		//skip when the allele is identical
+		if(i==k)
+		    continue;
+		if(j==k)
+		    continue;
+
+		toReturn<<populationNames->at(j)<<"-"<<populationNames->at(k)<<"@"<< populationNames->at(i)  <<"\t"<<dstatResults[i][j][k]<<endl;
+		//toReturn<<populationNames->at(i)<<"-"<<populationNames->at(j)<<"\t"<<divergenceResults[i][j]<<endl;
+	    }
        }
    }
     // cout<<"print() done"<<endl;

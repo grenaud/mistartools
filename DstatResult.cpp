@@ -86,3 +86,16 @@ DstatResult &  DstatResult::operator+=(const DstatResult & other){
     return *this;
 
 }
+
+
+DstatResult &  DstatResult::operator-=(const DstatResult & other){   
+    this->all             -= other.all;
+    this->noCpg           -= other.noCpg;
+    this->onlyCpg         -= other.onlyCpg;
+    this->transversions   -= other.transversions;
+    this->transitions     -= other.transitions;
+    this->noDamage        -= other.noDamage;
+
+    return *this;
+
+}

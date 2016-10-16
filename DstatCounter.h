@@ -41,6 +41,7 @@ class DstatCounter{
     double computeDST() const;
 
     DstatCounter &  operator+=(const DstatCounter & other);
+    DstatCounter &  operator-=(const DstatCounter & other);
 
     friend ostream& operator<<(ostream& os, const DstatCounter & ct){
 	/* vector<double> boostraps = ct.performBoostraps(); */

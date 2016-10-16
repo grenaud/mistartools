@@ -49,13 +49,13 @@ class DstatResult{
 	this->transversions   = other.transversions;
 	this->transitions     = other.transitions;
 	this->noDamage        = other.noDamage;
-
 	return *this;
     }
 
     string printWithBootstrap(list<vector< vector< vector<DstatResult> >  > >  & boostraps,unsigned int i,unsigned int j,unsigned int k,unsigned int numberOfBootstraps);
 		       
     DstatResult &  operator+=(const DstatResult & other);
+    DstatResult &  operator-=(const DstatResult & other);
 
     friend ostream& operator<<(ostream& os, const DstatResult & dr){
 	os<<":\t"               <<dr.all.headerForCount()  <<"\n";
