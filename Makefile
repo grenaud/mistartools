@@ -89,7 +89,7 @@ mistarcompute:	mistarcompute.o libgab/utils.o MistarPairwiseAvgCoa.o  MistarPair
 mistarcomputeParallel:	mistarcomputeParallel.o libgab/utils.o MistarPairwiseAvgCoa.o  MistarPairwiseDiff.o MistarParser.o libgab//gzstream/gzstream.o AllelePairCounter.o DistanceResult.o AvgCoaResult.o AlleleCounter.o ComputeAvgCoa_core.o DstatResult.o DstatCounter.o MistarDstats.o Dstat_core.o SingleAllele.o SumStatAvgCoa.o AlleleRecords.o NjTree.o Tree.o NodeTree.o UnrootedNode.o AllPairDistanceResult.o  mistarArmadillo.o 
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS)
 
-mistarcomputeParallel2:	mistarcomputeParallel2.o libgab/utils.o MistarPairwiseAvgCoa.o  MistarPairwiseDiff.o MistarParser.o libgab//gzstream/gzstream.o AllelePairCounter.o DistanceResult.o AvgCoaResult.o AlleleCounter.o ComputeAvgCoa_core.o DstatResult.o DstatCounter.o MistarDstats.o Dstat_core.o SingleAllele.o SumStatAvgCoa.o AlleleRecords.o NjTree.o Tree.o NodeTree.o UnrootedNode.o AllPairDistanceResult.o  mistarArmadillo.o 
+mistarcomputeParallel2:	mistarcomputeParallel2.o libgab/utils.o MistarPairwiseAvgCoa.o  MistarPairwiseDiff.o MistarParser.o libgab//gzstream/gzstream.o AllelePairCounter.o DistanceResult.o AvgCoaResult.o AlleleCounter.o ComputeAvgCoa_core.o DstatResult.o DstatCounter.o MistarDstats.o Dstat_core.o SingleAllele.o SumStatAvgCoa.o SumStatD.o AlleleRecords.o NjTree.o Tree.o NodeTree.o UnrootedNode.o AllPairDistanceResult.o  mistarArmadillo.o 
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS)
 
 ms2nj:	ms2nj.o	 libgab/utils.o libgab//gzstream/gzstream.o MSParser.o MSobject.o NjTree.o Tree.o NodeTree.o UnrootedNode.o AlleleCounter.o AllelePairCounter.o  mistarArmadillo.o

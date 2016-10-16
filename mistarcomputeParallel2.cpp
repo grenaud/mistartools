@@ -19,6 +19,7 @@
 #include "utils.h"
 #include "MistarParser.h"
 #include "SumStatAvgCoa.h"
+#include "SumStatD.h"
 
 using namespace std;
 
@@ -75,7 +76,7 @@ bool allowUndefined;
 // };
 
 template <typename STAT> //type 
-void *mainContaminationThread(void * argc){
+void *mainComputationThread(void * argc){
 
     vector<STAT *> * results =  static_cast<vector<STAT *> *>( argc ) ;
 
@@ -215,7 +216,7 @@ void *mainContaminationThread(void * argc){
 
 template <class STAT> //type 
 class parallelP{  
-    //    void *mainContaminationThread(void * argc);
+
 public:
     void launchThreads(string filename,int numberOfThreads,int sizeBins );
 };//end class parallelP
@@ -251,7 +252,7 @@ void parallelP<STAT>::launchThreads(string filename,int numberOfThreads,int size
     //cout<<"res "<<results<<endl;
     //launchThreads(numberOfThreads,*thread);
     for(int i=0;i<numberOfThreads;i++){
-        rc = pthread_create(&thread[i], NULL, mainContaminationThread<STAT>, results); 
+        rc = pthread_create(&thread[i], NULL, mainComputationThread<STAT>, results); 
         checkResults("pthread_create()\n", rc); 
     }                                          
 
@@ -495,13 +496,19 @@ int main (int argc, char *argv[]) {
     // queueFilesToprocess->push("file4");
     int numberOfThreads =       1;
     int sizeBins        = 1000000;
+    string program="none";
     const string usage=string(string(argv[0])+
-                              "This program filters VCF files (prints to the stdout)\n"+
+                              "\nThis program computers summary stats on mistar files\n\n"+
                               +" <options> [mistar file]"+"\n"+
+
+                              "\t"+"-p [program]"  +"\t\t" +"Program to use: (Default: "+program+"\n"+
+			      "\t"+"    paircoacompute"+"\tTo compute pairwise average coalescence\n"+
+			      "\t"+"    dstat"+"\t\tTo compute triple-wise D-statistics\n\n"+
+
 
                               "\t"+"-t [threads]"  +"\t\t" +"Threads to use (Default: "+stringify(numberOfThreads)+")\n"+
                               "\t"+"-s [size bin]" +"\t\t" +"Size of bins (Default: "+stringify(sizeBins)+")\n"+
-
+			      
 			      "");
 
     populationNames = new 	vector<string>  ();
@@ -512,7 +519,7 @@ int main (int argc, char *argv[]) {
 	cerr << "Usage "<<usage<<endl;
 	return 1;       
     }
-    
+
     for(int i=1;i<(argc-1);i++){ 
         if(string(argv[i]) == "-t" ){
             numberOfThreads=destringify<int>(argv[i+1]);
@@ -526,14 +533,30 @@ int main (int argc, char *argv[]) {
             continue;
         }
 
+        if(string(argv[i]) == "-p" ){
+	    program=string(argv[i+1]);
+            i++;
+            continue;
+        }
+
         cerr<<"Wrong option "<<argv[i]<<endl;
         return 1;
 
     }
 
-    parallelP<SumStatAvgCoa> pToRun;
-    pToRun.launchThreads(string(argv[argc-1]),numberOfThreads,sizeBins);
+    if(program == "paircoacompute"){
+	parallelP<SumStatAvgCoa> pToRun;
+	pToRun.launchThreads(string(argv[argc-1]),numberOfThreads,sizeBins);
+    }else{
+	if(program == "dstat"){
+	    parallelP<SumStatD> pToRun;
+	    pToRun.launchThreads(string(argv[argc-1]),numberOfThreads,sizeBins);	
+	}else{
+	    cerr<<"Wrong program "<<program<<endl;
+	    return 1;
 
+	}
+    }
     return 0;
 }
 
