@@ -95,6 +95,7 @@ class SumStatAvgCoa{
 
     string print() const;
     string printWithBootstraps(const   vector<SumStatAvgCoa *> * bootstr) const;
+    /* string printWithJacknife(const vector< const SumStatAvgCoa * >  * jacknife); */
 
     friend ostream& operator<<(ostream& os, const SumStatAvgCoa & ct){
 	os<<ct.print();

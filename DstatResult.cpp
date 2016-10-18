@@ -74,6 +74,78 @@ string DstatResult::printWithBootstrap(list<vector< vector< vector<DstatResult> 
     return toreturn.str();
 }
 
+void DstatResult::addIfNotInfinity( vector<double> * target , double val ){
+    if(val != std::numeric_limits<double>::infinity()){
+	target->push_back(val);
+    }
+}
+
+string DstatResult::printWithJacknife(const vector<const  DstatResult * >  * jacknife){
+    stringstream toreturn;
+
+    vector<double> allBoot;
+    vector<double> nocpgBoot;
+    vector<double> onlycpgBoot;
+    vector<double> transitionsBoot;
+    vector<double> transversionsBoot;
+    vector<double> noDamageBoot;
+
+
+    // vector<double> counterReferenceB;
+    // vector<double> counterBothB;
+    
+    //all
+    //for (vector< AvgCoaResult * > ::iterator it=jacknife->begin(); it != jacknife->end(); it++){
+    for (unsigned int k=0;k<jacknife->size(); k++){
+	//cout<<"jack "<<jacknife->at(k)->all.avgCoaRefSam()<<endl;
+	addIfNotInfinity( &allBoot,             jacknife->at(k)->all.computeDST()              );
+	addIfNotInfinity( &nocpgBoot,           jacknife->at(k)->noCpg.computeDST()            );
+	addIfNotInfinity( &onlycpgBoot,         jacknife->at(k)->onlyCpg.computeDST()          );
+	addIfNotInfinity( &transitionsBoot,     jacknife->at(k)->transitions.computeDST()      );
+	addIfNotInfinity( &transversionsBoot,   jacknife->at(k)->transversions.computeDST()    );
+	addIfNotInfinity( &noDamageBoot,        jacknife->at(k)->noDamage.computeDST()         );
+
+
+    }
+
+
+    pair<double,double> allJK           =  computeJackknifeConfIntervals(all.computeDST(),          allBoot          );
+    pair<double,double> noCpgJK         =  computeJackknifeConfIntervals(noCpg.computeDST(),        nocpgBoot        );
+    pair<double,double> onlyCpgJK       =  computeJackknifeConfIntervals(onlyCpg.computeDST(),      onlycpgBoot      );
+    pair<double,double> transitionsJK   =  computeJackknifeConfIntervals(transitions.computeDST(),  transitionsBoot  );
+    pair<double,double> transversionsJK =  computeJackknifeConfIntervals(transversions.computeDST(),transversionsBoot);
+    pair<double,double> noDamageJK      =  computeJackknifeConfIntervals(noDamage.computeDST(),     transversionsBoot);
+
+
+    
+    // cout<<"jk size"<<jacknife->size()<<"\t"<<allDEVRefSam.first                <<"\t"<<allDEVRefSam.second            <<"\t"<<( (all.avgCoaRefSam()-allDEVRefSam.first)            / allDEVRefSam.second)<<"\t"<<ppp.first<<"\t"<<ppp.second<<"\tlb"<<pppRef.first<<"\tub"<<pppRef.second<<"\t"<<pppBoth.first<<"\t"<<pppBoth.second<<"\t"<<(pppRef.first/pppBoth.second)<<"\t"<<(pppRef.second/pppBoth.first)<<"\t"<<all.counterReference<<"\t"<<(all.counterReference+all.counterCommon)<<endl;
+    //exit(1);
+
+    toreturn
+	<<all<<"\t"  
+	<<allJK.first                <<"\t"<<allJK.second             <<"\t"  
+
+	<<onlyCpg<<"\t"  
+	<<onlyCpgJK.first            <<"\t"<<onlyCpgJK.second 	<<"\t"  
+
+	<<noCpg<<"\t"  
+	<<noCpgJK.first              <<"\t"<<noCpgJK.second 	        <<"\t"            
+
+	<<transitions<<"\t"  
+	<<transitionsJK.first        <<"\t"<<transitionsJK.second 	<<"\t"      
+
+	<<transversions<<"\t"  
+	<<transversionsJK.first      <<"\t"<<transversionsJK.second 	<<"\t"    
+
+	<<noDamage<<"\t"  
+	<<noDamageJK.first           <<"\t"<<noDamageJK.second       ;
+    
+
+    return toreturn.str();
+
+    
+}
+
 DstatResult &  DstatResult::operator+=(const DstatResult & other){   
 
     this->all             += other.all;

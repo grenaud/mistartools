@@ -10,7 +10,6 @@
 
 
 bool computeDstat(const char allel_chimpHumanAncestor,const char allel_condition,const char allel_ind1,const char allel_ind2,const bool isCpG,DstatResult * dSres){
-
     //must be different
     if(allel_chimpHumanAncestor == allel_condition){
 	return false;
@@ -33,6 +32,7 @@ bool computeDstat(const char allel_chimpHumanAncestor,const char allel_condition
     }
 
 
+    
     //AA
     if( ( allel_ind1    == allel_chimpHumanAncestor) &&
 	( allel_ind2    == allel_chimpHumanAncestor) ){
@@ -57,6 +57,8 @@ bool computeDstat(const char allel_chimpHumanAncestor,const char allel_condition
 	    dSres->noDamage.counterAncAnc++;
 	}
 
+	//cout<<"AA"<<endl;
+	
 	return false;
 
     }else{
@@ -85,6 +87,8 @@ bool computeDstat(const char allel_chimpHumanAncestor,const char allel_condition
 		dSres->noDamage.counterAncDer++;
 	    }
 
+	    //cout<<"AD"<<endl;
+	    
 	    return true;
 
 	}else{
@@ -111,6 +115,8 @@ bool computeDstat(const char allel_chimpHumanAncestor,const char allel_condition
 		     toupper(allel_condition)           == 'A'  ) ){
 		    dSres->noDamage.counterDerAnc++;
 		}
+
+		//cout<<"DA"<<endl;
 
 		return true;
 
@@ -142,7 +148,8 @@ bool computeDstat(const char allel_chimpHumanAncestor,const char allel_condition
 			dSres->noDamage.counterDerDer++;
 		    }
 
-
+		    //cout<<"DD"<<endl;
+		    
 		    return false;
 
 		}else{

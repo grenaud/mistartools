@@ -51,20 +51,33 @@ class DstatResult{
 	this->noDamage        = other.noDamage;
 	return *this;
     }
-
+    void addIfNotInfinity( vector<double> * target , double val );
     string printWithBootstrap(list<vector< vector< vector<DstatResult> >  > >  & boostraps,unsigned int i,unsigned int j,unsigned int k,unsigned int numberOfBootstraps);
-		       
+    string printWithJacknife(const vector< const DstatResult * >  * jacknife);
+
+
     DstatResult &  operator+=(const DstatResult & other);
     DstatResult &  operator-=(const DstatResult & other);
 
     friend ostream& operator<<(ostream& os, const DstatResult & dr){
-	os<<":\t"               <<dr.all.headerForCount()  <<"\n";
-	os<<"all_sites:\t"      <<dr.all                   <<"\n";
-	os<<"nocpg_sites:\t"    <<dr.noCpg                 <<"\n";
-	os<<"onlycpg_sites:\t"  <<dr.onlyCpg               <<"\n";
-	os<<"transitions:\t"    <<dr.transitions           <<"\n";
-	os<<"transversions:\t"  <<dr.transversions         <<"\n";
-	os<<"nodamage:\t"       <<dr.noDamage              <<"\n";
+	/* cout<<"DstatResult print() begin"<<endl; */
+	/* exit(1); */
+	os<<dr.all          <<"\t"
+	  <<dr.onlyCpg      <<"\t"  
+	  <<dr.noCpg        <<"\t"  
+	  <<dr.transitions  <<"\t"  
+	  <<dr.transversions<<"\t"  
+	  <<dr.noDamage;  
+
+	/* os<<":\t"               <<dr.all.headerForCount()  <<"\n"; */
+	/* os<<"all_sites:\t"      <<dr.all                   <<"\n"; */
+	/* os<<"nocpg_sites:\t"    <<dr.noCpg                 <<"\n"; */
+	/* os<<"onlycpg_sites:\t"  <<dr.onlyCpg               <<"\n"; */
+	/* os<<"transitions:\t"    <<dr.transitions           <<"\n"; */
+	/* os<<"transversions:\t"  <<dr.transversions         <<"\n"; */
+	/* os<<"nodamage:\t"       <<dr.noDamage              <<"\n"; */
+
+	
 	/* os<<"all\t"<<dr.all<<"\n" */
 	/*   <<"all\t"<<dr.onlyCpg<<"\n" */
 	/*   <<dr.noCpg<<"\n" */
