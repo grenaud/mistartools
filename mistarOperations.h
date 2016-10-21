@@ -57,6 +57,13 @@ bool printAllele(vector<MistarParser * > & vectorOfMP,
 		 unsigned int & coordCurrent,
 		 bool force=false);
 
+char mistar2uipac(const char & refAllele,
+		  const char & altAllele,
+		  const int &  refCount,
+		  const int &  altCount);
+
+
+
 map< string, vector<GenomicRange> * > * readBEDSortedfile(string filetoread);
 
 

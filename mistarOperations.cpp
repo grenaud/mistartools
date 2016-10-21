@@ -336,3 +336,24 @@ map< string, vector<GenomicRange> * > * readBEDSortedfile(string filetoread){
 }
 
 
+char mistar2uipac(const char & refAllele,
+		  const char & altAllele,
+		  const int  & refCount,
+		  const int  & altCount){
+
+    if( (refCount  > 0) && (altCount == 0) )
+	return refAllele;
+
+    if( (refCount == 0) && (altCount  > 0) ){
+	if(altAllele!='N')
+	    return altAllele;
+	else{
+	    cerr<<"ERROR: mistarOperations, problem with "<<refAllele<<","<<altAllele<<" the alt allele should not be undefined"<<endl;
+	    exit(1);
+	}
+    }
+
+    //ref and alt are not 0
+    
+
+}

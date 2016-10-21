@@ -218,7 +218,7 @@ template <class STAT> //type
 class parallelP{  
 
 public:
-    void launchThreads(string filename,int numberOfThreads,int sizeBins );
+    void launchThreads(string filename,int numberOfThreads,int sizeBins, bool produceEveryBoot );
 };//end class parallelP
 
 //template <class STAT> //type 
@@ -227,7 +227,7 @@ public:
 // vector<STAT> results;
 
 template <class STAT> //type 
-void parallelP<STAT>::launchThreads(string filename,int numberOfThreads,int sizeBins ){
+void parallelP<STAT>::launchThreads(string filename,int numberOfThreads,int sizeBins , bool produceEveryBoot){
 
     doneReading=false;
     queueFilesToprocess = new queue< vector< string >  * >()  ;
@@ -461,12 +461,14 @@ void parallelP<STAT>::launchThreads(string filename,int numberOfThreads,int size
 	    // cout<<"done dd2"<<endl;
 	}
 
-	for (unsigned int i=0; i<results->size() ; ++i) {    
-	    // cout<<i<<"\n#####\n"<<endl;
-	    //	cout<<results->at(i)<<endl;
-	    cout<<"---------------------------"<<endl;
-	    cout<<results->at(i)->print()<<endl;
-	    //	cout<<i<<"\n#####\n"<<endl;
+	if(produceEveryBoot){
+	    for (unsigned int i=0; i<results->size() ; ++i) {    
+		// cout<<i<<"\n#####\n"<<endl;
+		//	cout<<results->at(i)<<endl;
+		cout<<"---------------------------"<<endl;
+		cout<<results->at(i)->print()<<endl;
+		//	cout<<i<<"\n#####\n"<<endl;
+	    }
 	}
 
 	for (unsigned int i=0; i<results->size() ; ++i) {    
@@ -497,15 +499,16 @@ int main (int argc, char *argv[]) {
     int numberOfThreads =       1;
     int sizeBins        = 1000000;
     string program="none";
+    bool produceEveryBoot=false;
     const string usage=string(string(argv[0])+
                               "\nThis program computers summary stats on mistar files\n\n"+
-                              +" <options> [mistar file]"+"\n"+
+                              +" <options> [mistar file]"+"\n\n"+
 
                               "\t"+"-p [program]"  +"\t\t" +"Program to use: (Default: "+program+"\n"+
 			      "\t"+"    paircoacompute"+"\tTo compute pairwise average coalescence\n"+
 			      "\t"+"    dstat"+"\t\tTo compute triple-wise D-statistics\n\n"+
 
-
+			      "\t"+"-b\t"  +"\t\t" +"Print every subregion separately (Default: "+booleanAsString(produceEveryBoot)+")\n"+
                               "\t"+"-t [threads]"  +"\t\t" +"Threads to use (Default: "+stringify(numberOfThreads)+")\n"+
                               "\t"+"-s [size bin]" +"\t\t" +"Size of bins (Default: "+stringify(sizeBins)+")\n"+
 			      
@@ -539,6 +542,11 @@ int main (int argc, char *argv[]) {
             continue;
         }
 
+        if(string(argv[i]) == "-b" ){
+	    produceEveryBoot=true;
+            continue;
+        }
+
         cerr<<"Wrong option "<<argv[i]<<endl;
         return 1;
 
@@ -546,11 +554,11 @@ int main (int argc, char *argv[]) {
 
     if(program == "paircoacompute"){
 	parallelP<SumStatAvgCoa> pToRun;
-	pToRun.launchThreads(string(argv[argc-1]),numberOfThreads,sizeBins);
+	pToRun.launchThreads(string(argv[argc-1]),numberOfThreads,sizeBins,produceEveryBoot);
     }else{
 	if(program == "dstat"){
 	    parallelP<SumStatD> pToRun;
-	    pToRun.launchThreads(string(argv[argc-1]),numberOfThreads,sizeBins);	
+	    pToRun.launchThreads(string(argv[argc-1]),numberOfThreads,sizeBins,produceEveryBoot);	
 	}else{
 	    cerr<<"Wrong program "<<program<<endl;
 	    return 1;

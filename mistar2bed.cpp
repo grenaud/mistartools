@@ -59,8 +59,13 @@ int main (int argc, char *argv[]) {
 
 	}else{
 	 
-	    if(previousCoordinate >= dataRow->coordinate){
-		cerr<<"There seems to be a unsorted coordinate in the mistar file, needs to be sorted coordinate: "<<previousCoordinate<<endl;
+	    if(previousCoordinate == dataRow->coordinate){
+		cerr<<"WARNING: There seems to be redundant records in the mistar file, see coordinate: "<<chrName<<":"<<previousCoordinate<<endl;
+		//return 1;
+	    }
+
+	    if(previousCoordinate > dataRow->coordinate){
+		cerr<<"ERROR: There seems to be a unsorted coordinate in the mistar file, needs to be sorted coordinate: "<<chrName<<":"<<previousCoordinate<<endl;
 		return 1;
 	    }
 
