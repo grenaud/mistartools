@@ -398,7 +398,8 @@ void parallelP<STAT>::launchThreads(string filename,int numberOfThreads,int size
 			rc = pthread_mutex_lock(&mutexQueue);
 			checkResults("pthread_mutex_lock()\n", rc);
 		    }
-		
+
+		    
 		    queueFilesToprocess->push(vecForBin);
 
 
