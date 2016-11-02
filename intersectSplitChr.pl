@@ -297,7 +297,7 @@ foreach my $chr (@humanchr){
 }
 $cmdcat = $cmdcat. " | ".$bgzipcmd." -c > ".$outprefix."_all.noundef.mst.gz";
 
-$stringPrintlater=$stringPrintlater."\n".$outprefix."_all.noundef.mst.gz.tbi: ".join(" ",@arrayAllChrCombined)."\n\t".$cmdcat."\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_all.noundef.mst.gz\n\n";
+$stringPrintlater=$stringPrintlater."\n".$outprefix."_all.noundef.mst.gz.tbi: ".join(" ",@arrayAllChrUNDEFCombined)."\n\t".$cmdcat."\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_all.noundef.mst.gz\n\n";
 
 push(@arrayTargets,        $outprefix."_all.noundef.mst.gz.tbi");
 #push(@arrayDeleteCombined, $outprefix."_all.noundef.mst.gz.tbi");
