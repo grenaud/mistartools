@@ -105,6 +105,7 @@ $cmd=$mistar2bed." ".$inputMSTfile." ";
 #detect mergeBed
 my $cmdmergebeddetect="which mergeBed";
 my $mergebebpath=`$cmdmergebeddetect`;
+chomp($mergebebpath);
 if(!$mergebebpath){
   die "ERROR: cannot detect command mergeBed, please install it and make it accessible in your path\n";
 }
