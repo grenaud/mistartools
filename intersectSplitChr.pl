@@ -255,7 +255,7 @@ foreach my $chr (@humanchr){
   #add no undef
   push(@arrayDeleteCombined, $outprefix."_".$chr.".noundef.mst.gz.tbi");
 
-  $stringPrintlater=$stringPrintlater."\n".$outprefix."_".$chr.".noundef.mst.gz.tbi:\n\t".$mistarfilter." ".$outprefix."_".$chr.".mst.gz | ".$bgzipcmd." -c > ".$outprefix."_".$chr.".noundef.mst.gz\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_".$chr.".noundef.mst.gz\n\n";
+  $stringPrintlater=$stringPrintlater."\n".$outprefix."_".$chr.".noundef.mst.gz.tbi:\n\t".$mistarfilter." noundef  ".$outprefix."_".$chr.".mst.gz | ".$bgzipcmd." -c > ".$outprefix."_".$chr.".noundef.mst.gz\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_".$chr.".noundef.mst.gz\n\n";
 
 }
 
