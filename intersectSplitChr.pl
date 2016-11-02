@@ -232,13 +232,22 @@ for(my $i=0;$i<$#ARGV;){
 
 my $outprefix = $ARGV[ $#ARGV ] ;
 my @arrayTargets;
-my @arrayDeleteCombined;
+my @arrayAllChrCombined;
+my @arrayAllChrUNDEFCombined;
+
+my @arrayDeleteIntermediate;
+
+
 my $stringPrintlater="";
 
 
 foreach my $chr (@humanchr){
   #push(@arrayTargets,        $outprefix."_".$chr.".mst.gz.tbi");
-  push(@arrayDeleteCombined, $outprefix."_".$chr.".mst.gz.tbi");
+  push(@arrayAllChrCombined,     $outprefix."_".$chr.".mst.gz.tbi");
+  push(@arrayDeleteIntermediate, $outprefix."_".$chr.".mst.gz");
+  push(@arrayDeleteIntermediate, $outprefix."_".$chr.".mst.gz.tbi");
+
+
   my $cmd = $mistarintersect." ";
   foreach my $rec (@filesToAnalyze){
     if($rec->[1] eq ""){
@@ -253,9 +262,13 @@ foreach my $chr (@humanchr){
   $stringPrintlater=$stringPrintlater."\n".$outprefix."_".$chr.".mst.gz.tbi:\n\t".$cmd."\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_".$chr.".mst.gz\n\n";
 
   #add no undef
-  push(@arrayDeleteCombined, $outprefix."_".$chr.".noundef.mst.gz.tbi");
+  push(@arrayAllChrUNDEFCombined, $outprefix."_".$chr.".noundef.mst.gz.tbi");
 
-  $stringPrintlater=$stringPrintlater."\n".$outprefix."_".$chr.".noundef.mst.gz.tbi:\n\t".$mistarfilter." noundef  ".$outprefix."_".$chr.".mst.gz | ".$bgzipcmd." -c > ".$outprefix."_".$chr.".noundef.mst.gz\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_".$chr.".noundef.mst.gz\n\n";
+  push(@arrayDeleteIntermediate,  $outprefix."_".$chr.".noundef.mst.gz");
+  push(@arrayDeleteIntermediate,  $outprefix."_".$chr.".noundef.mst.gz.tbi");
+
+
+  $stringPrintlater=$stringPrintlater."\n".$outprefix."_".$chr.".noundef.mst.gz.tbi: ".$outprefix."_".$chr.".mst.gz.tbi\n\t".$mistarfilter." noundef  ".$outprefix."_".$chr.".mst.gz | ".$bgzipcmd." -c > ".$outprefix."_".$chr.".noundef.mst.gz\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_".$chr.".noundef.mst.gz\n\n";
 
 }
 
@@ -267,11 +280,11 @@ foreach my $chr (@humanchr){
 }
 $cmdcat = $cmdcat. " | ".$bgzipcmd." -c > ".$outprefix."_all.mst.gz";
 
-$stringPrintlater=$stringPrintlater."\n".$outprefix."_all.mst.gz.tbi: ".join(" ",@arrayDeleteCombined)."\n\t".$cmdcat."\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_all.mst.gz\n\n";
+$stringPrintlater=$stringPrintlater."\n".$outprefix."_all.mst.gz.tbi: ".join(" ",@arrayAllChrCombined)."\n\t".$cmdcat."\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_all.mst.gz\n\n";
 
 
 push(@arrayTargets,        $outprefix."_all.mst.gz.tbi");
-push(@arrayDeleteCombined, $outprefix."_all.mst.gz.tbi");
+#push(@arrayDeleteCombined, $outprefix."_all.mst.gz.tbi");
 
 
 
@@ -284,13 +297,13 @@ foreach my $chr (@humanchr){
 }
 $cmdcat = $cmdcat. " | ".$bgzipcmd." -c > ".$outprefix."_all.noundef.mst.gz";
 
-$stringPrintlater=$stringPrintlater."\n".$outprefix."_all.noundef.mst.gz.tbi: ".join(" ",@arrayDeleteCombined)."\n\t".$cmdcat."\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_all.noundef.mst.gz\n\n";
+$stringPrintlater=$stringPrintlater."\n".$outprefix."_all.noundef.mst.gz.tbi: ".join(" ",@arrayAllChrCombined)."\n\t".$cmdcat."\n\t".$tabixcmd."  -s 1 -b 2 -e 2 ".$outprefix."_all.noundef.mst.gz\n\n";
 
 push(@arrayTargets,        $outprefix."_all.noundef.mst.gz.tbi");
-push(@arrayDeleteCombined, $outprefix."_all.noundef.mst.gz.tbi");
+#push(@arrayDeleteCombined, $outprefix."_all.noundef.mst.gz.tbi");
 
 
-print "SHELL := /bin/bash\n\nall:\t".join(" ",@arrayTargets)."\n\nclean:\n\trm -vf ".join(" ",@arrayTargets)."\n\ncleancombined:\n\trm -vf ".join(" ",@arrayDeleteCombined)."\n\n".$stringPrintlater."\n";
+print "SHELL := /bin/bash\n\nall:\t".join(" ",@arrayTargets)."\n\ncleanall:\n\trm -vf ".join(" ",@arrayTargets)."\n\ncleanintermediate:\n\trm -vf ".join(" ",@arrayDeleteIntermediate)."\n\n".$stringPrintlater."\n";
 
 
 #print Dumper(@filesToAnalyze);
