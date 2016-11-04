@@ -82,14 +82,20 @@ int main (int argc, char *argv[]) {
     unsigned int totalRecords=0;
     unsigned int keptRecords=0;
 
+    
     while(mp.hasData()){
 	//cout<<"data"<<endl;
 	test = mp.getData();
 	totalRecords++;
+	if( (totalRecords%10000000) == 0){
+	    cerr<<"Looked at "<<totalRecords<<" records @ "<<test->chr<<":"<<test->coordinate<<endl;
+	}
+	
 	if(test->alt == 'N'){
 	    continue;
 	}
 
+	
 	if(limitToTransversions){
 	    //skip potential transitions
 	    if(isPotentialTransition(test->ref,test->alt))
