@@ -125,14 +125,14 @@ my $outputftempBED=$outputf."bed_";
 
 
 #call mistar2gphocs
-$cmd = $cmd ."  > ".$outputftempBED;
+$cmd = $cmd ."  |gzip  > ".$outputftempBED;
 runcmd($cmd);
 
 
 #running mistar2phocs
 my $outputftemp=$outputf."_";
 
-$cmd = $mistar2gphocs ."  ".$inputMSTfile." $outputftempBED > ".$outputftemp;
+$cmd = $mistar2gphocs ."  ".$inputMSTfile." <(zcat $outputftempBED) > ".$outputftemp;
 runcmd($cmd);
 
 
