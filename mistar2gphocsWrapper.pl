@@ -121,10 +121,18 @@ if($minlength>0){
   $cmd = $cmd ." | awk '{if( (\$3-\$2)>=".$minlength." ){print \$0}}' ";
 }
 
-my $outputftemp=$outputf."_";
+my $outputftempBED=$outputf."bed_";
+
 
 #call mistar2gphocs
-$cmd = $cmd ." | ". $mistar2gphocs ."  ".$inputMSTfile." /dev/stdin > ".$outputftemp;
+$cmd = $cmd ."  > ".$outputftempBED;
+runcmd($cmd);
+
+
+#running mistar2phocs
+my $outputftemp=$outputf."_";
+
+$cmd = $mistar2gphocs ."  ".$inputMSTfile." $outputftempBED > ".$outputftemp;
 runcmd($cmd);
 
 
