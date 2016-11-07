@@ -21,11 +21,12 @@ indS<-l[c(FALSE,FALSE,TRUE) ]
 
 
 m<-as.matrix(data)
-m[upper.tri(m)] <- NA
+#m[lower.tri(m)] <- NA
 
 dat<-as.data.frame(cbind(as.matrix(ind1),as.matrix(ind2),as.matrix(indS), m[,seq(2,(length(data)-1))]) ,stringsAsFactors=FALSE)
 
 dat<-dat[dat$V3==args[2],]
+#dat<-dat[dat$V3=="15302",]
 
 cols = seq(3,length(dat)-2);
 dat[,cols] = apply(dat[,cols], 2, function(x) as.numeric(x));
@@ -42,13 +43,13 @@ class(valmin)<-"numeric"
 class(valmax)<-"numeric"
 
 
-val<-    round(val*100,2)
-valmin<- round(valmin*100,2)
-valmax<- round(valmax*100,2)
+val<-    round(val,2)
+valmin<- round(valmin,2)
+valmax<- round(valmax,2)
 
 my_palette <- colorRampPalette(c("red", "yellow", "green"))(n = 299)
 
-
+#val[lower.tri(val)] <- NA
 
 pdf(paste(args[3],"heat.pdf",sep=""),width = 10, height = 10)
 #png("filename.png",width=2000,height=800)
@@ -56,7 +57,7 @@ pdf(paste(args[3],"heat.pdf",sep=""),width = 10, height = 10)
 
 p<-heatmap.2(val,
   cellnote = val,  # same data set for cell labels
-  main = paste("Pairwise coalescence using source ",args[2],sep=""), # heat map title
+  main = paste("Dstatistics using source ",args[2],sep=""), # heat map title
   notecol="black",      # change font color of cell labels to black
   density.info="none",  # turns off density plot inside color legend
   trace="none",         # turns off trace lines inside the heat map
