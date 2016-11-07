@@ -273,6 +273,11 @@ int main (int argc, char *argv[]) {
 		//anc
 		toprint.push_back(dataRow->vectorAlleles->at(1));
 		bool someoneHasAlt=false;//flag to check if someone has the alternative, otherwise, we will set the alt to N
+		//root can cause alt
+		someoneHasAlt=someoneHasAlt || (dataRow->vectorAlleles->at(0).getAltCount() != 0);
+		//anc  can cause alt
+		someoneHasAlt=someoneHasAlt || (dataRow->vectorAlleles->at(1).getAltCount() != 0);
+		
 
 		for(unsigned j=2;j<dataRow->vectorAlleles->size();j++){
 		    		    
