@@ -13,6 +13,8 @@
 #include "GenomicRange.h"
 #include "mistarOperations.h"
 
+//#define DEBUG
+
 using namespace std;
 
 int main (int argc, char *argv[]) {
@@ -60,7 +62,7 @@ int main (int argc, char *argv[]) {
     unsigned int   previousCoordinatePrinted =    0;
     bool           inBlockOfSequence         =false;
     unsigned int   locusNumber               =    0;
-    vector<string> sequencesToPrint (mp.getPopulationsNames()->size()-2,"");//do not produce anc and root
+    vector<string> sequencesToPrint (mp.getPopulationsNames()->size()-1,"");//do not produce anc
     unsigned int   keptRecords               =    0;
     unsigned int   totalRecords              =    0;
 
@@ -81,7 +83,7 @@ int main (int argc, char *argv[]) {
 	    }else{
 		chrFoundInBed=true;
 		currentGr    = bedRegionsToFilter->at(dataRow->chr) ;
-		currentIndex =   coordinateOfVec->at(dataRow->chr) ;
+		currentIndex = coordinateOfVec->at(   dataRow->chr) ;
 		if(currentIndex!=0){
 		    cerr<<"There seems to be a mix of chromosomes in the mistar file, needs to be sorted chr: "<<chrName<<endl;
 		    return 1;
@@ -119,9 +121,13 @@ int main (int argc, char *argv[]) {
 		// cout<<"case 1"<<endl;
 		if(inBlockOfSequence){
 		    //flushing
-		    cout<<"locus"<<++locusNumber<<" "<<(mp.getPopulationsNames()->size()-2)<<" "<<sequencesToPrint[0].size()<<endl;
-		    for(unsigned int p=2;p<mp.getPopulationsNames()->size();p++){
-			cout<<mp.getPopulationsNames()->at(p)<<"\t"<<sequencesToPrint[p-2]<<endl;
+		    cout<<"locus"<<++locusNumber<<" "<<(mp.getPopulationsNames()->size()-1)<<" "<<sequencesToPrint[0].size()<<endl;//minus anc
+		    for(unsigned int p=0;p<mp.getPopulationsNames()->size();p++){
+			if(p==1) continue;//no anc
+			if(p==0) 
+			    cout<<mp.getPopulationsNames()->at(p)<<"\t"<<sequencesToPrint[p  ]<<endl;
+			else
+			    cout<<mp.getPopulationsNames()->at(p)<<"\t"<<sequencesToPrint[p-1]<<endl;
 		    }
 		    cout<<endl;
 		    inBlockOfSequence=false;
@@ -136,9 +142,11 @@ int main (int argc, char *argv[]) {
 	    //            *     
 	    if(dataRow->coordinate >= currentGr->at(currentIndex).getStartCoord() &&
 	       dataRow->coordinate <= currentGr->at(currentIndex).getEndCoord() ){
-		// cout<<"case 2"<<endl;
-		// cout<<inBlockOfSequence<<" "<<(*dataRow)<<endl;
-		// cout<<dataRow->chr<<"\t"<<dataRow->coordinate<<"\t"<<currentIndex<<endl;
+#ifdef DEBUG
+		cerr<<"case 2"<<endl;
+		cerr<<inBlockOfSequence<<" "<<(*dataRow)<<endl;
+		cerr<<dataRow->chr<<"\t"<<dataRow->coordinate<<"\t"<<currentIndex<<endl;
+#endif
 		char refB=dataRow->ref;
 		char altB=dataRow->alt;
 		char hetB='N';//UIPAC base for het sites
@@ -150,7 +158,7 @@ int main (int argc, char *argv[]) {
 		
 		if(!inBlockOfSequence){//first time in block
 		    //init
-		    sequencesToPrint = vector<string>  (mp.getPopulationsNames()->size()-2,"");//init, do not produce anc and root
+		    sequencesToPrint = vector<string>  (mp.getPopulationsNames()->size()-1,"");//init, do not produce anc and root
 		    inBlockOfSequence=true;
 
 		   
@@ -164,14 +172,21 @@ int main (int argc, char *argv[]) {
 			//end of a block but overshot to next chr
 
 			//flush current locus
-			cout<<"locus"<<++locusNumber<<" "<<(mp.getPopulationsNames()->size()-2)<<" "<<sequencesToPrint[0].size()<<endl;
-			for(unsigned int p=2;p<mp.getPopulationsNames()->size();p++){
-			    cout<<mp.getPopulationsNames()->at(p)<<"\t"<<sequencesToPrint[p-2]<<endl;
+			cout<<"locus"<<++locusNumber<<" "<<(mp.getPopulationsNames()->size()-1)<<" "<<sequencesToPrint[0].size()<<endl;
+
+
+			for(unsigned int p=0;p<mp.getPopulationsNames()->size();p++){
+			    if(p==1) continue;//no anc
+			    if(p==0) 
+				cout<<mp.getPopulationsNames()->at(p)<<"\t"<<sequencesToPrint[p  ]<<endl;
+			    else
+				cout<<mp.getPopulationsNames()->at(p)<<"\t"<<sequencesToPrint[p-1]<<endl;
+			    
 			}
 			cout<<endl;
 
 			//re-init
-			sequencesToPrint = vector<string>  (mp.getPopulationsNames()->size()-2,"");//init, do not produce anc and root
+			sequencesToPrint = vector<string>  (mp.getPopulationsNames()->size()-1,"");//init, do not produce anc and root
 
 			//leave inBlockOfSequence flag as is
 		    }
@@ -190,8 +205,12 @@ int main (int argc, char *argv[]) {
 			//print Ns in between 
 			for(unsigned int i=(previousCoordinatePrinted+1);i<=(dataRow->coordinate-1);i++){
 			    //cout<<"ADD MISSING"<<chrPrinted<<":"<<i<<endl;
-			    for(unsigned j=2;j<dataRow->vectorAlleles->size();j++){
-				sequencesToPrint[j-2] += "N";				
+			    for(unsigned j=0;j<dataRow->vectorAlleles->size();j++){
+				if(j==1) continue;
+				if(j==0)
+				    sequencesToPrint[j  ] += "N";
+				else
+				    sequencesToPrint[j-1] += "N";				
 			    }
 			}
 			//end of printing intervening Ns
@@ -203,12 +222,16 @@ int main (int argc, char *argv[]) {
 
 
 		//add current bases
-		//cout<<"add "<<endl;
-		// cout<<inBlockOfSequence<<" "<<(*dataRow)<<endl;
+#ifdef DEBUG
+		cerr<<"add "<<endl;
+		cerr<<inBlockOfSequence<<" "<<(*dataRow)<<endl;
+#endif
 		previousCoordinatePrinted = dataRow->coordinate;
 		chrPrinted                = dataRow->chr;
 
-		for(unsigned j=2;j<dataRow->vectorAlleles->size();j++){
+		for(unsigned j=0;j<dataRow->vectorAlleles->size();j++){
+		    if(j==1) continue;
+
 		    //undefined site
 		    if( (dataRow->vectorAlleles->at(j).getRefCount() + dataRow->vectorAlleles->at(j).getAltCount()) > 2) {
 			cerr<<"ERROR: population "<<j<<" has more than 2 alleles at coordinate "<<dataRow->chr<<":"<<dataRow->coordinate<<endl;
@@ -216,7 +239,21 @@ int main (int argc, char *argv[]) {
 		    }
 
 		    if( (dataRow->vectorAlleles->at(j).getRefCount() + dataRow->vectorAlleles->at(j).getAltCount()) != 2) {
-			sequencesToPrint[j-2] += "N";
+			if(j==0){//exception for the root, can be 1,0 or 0,1
+			    if( (dataRow->vectorAlleles->at(j).getRefCount() == 1) && (dataRow->vectorAlleles->at(j).getAltCount() == 0) ){ 
+				sequencesToPrint[j ] += refB;
+				continue;
+			    }
+			    
+			    if( (dataRow->vectorAlleles->at(j).getRefCount() == 0) && (dataRow->vectorAlleles->at(j).getAltCount() == 1) ){
+				sequencesToPrint[j ] += altB;
+				continue;
+			    }
+			    
+			    sequencesToPrint[j ] += "N";			    
+			}else{
+			    sequencesToPrint[j-1] += "N";
+			}
 			continue;
 		    }
 		    //cout<<"add2 "<<sequencesToPrint[j-2]<<" "<<refB<<endl;
@@ -224,7 +261,10 @@ int main (int argc, char *argv[]) {
 		    //homo ref
 		    if( (dataRow->vectorAlleles->at(j).getRefCount() == 2) && 
 			(dataRow->vectorAlleles->at(j).getAltCount() == 0) ){
-			sequencesToPrint[j-2] += refB;
+			if(j==0)
+			    sequencesToPrint[j  ] += refB;
+			else
+			    sequencesToPrint[j-1] += refB;
 			continue;
 		    }
 		    //cout<<"add3 "<<sequencesToPrint[j-2]<<" "<<hetB<<endl;
@@ -232,14 +272,20 @@ int main (int argc, char *argv[]) {
 		    //het ref+alt
 		    if( (dataRow->vectorAlleles->at(j).getRefCount() == 1) && 
 			(dataRow->vectorAlleles->at(j).getAltCount() == 1) ){
-			sequencesToPrint[j-2] += hetB;
+			if(j==0)
+			    sequencesToPrint[j  ] += hetB;
+			else
+			    sequencesToPrint[j-1] += hetB;
 			continue;
 		    }
 		    //cout<<"add4 "<<sequencesToPrint[j-2]<<" "<<altB<<endl;
 		    //homo alt
 		    if( (dataRow->vectorAlleles->at(j).getRefCount() == 0) && 
 			(dataRow->vectorAlleles->at(j).getAltCount() == 2) ){
-			sequencesToPrint[j-2] += altB;
+			if(j==0)
+			    sequencesToPrint[j  ] += altB;
+			else
+			    sequencesToPrint[j-1] += altB;
 			continue;
 		    }
 
@@ -270,9 +316,14 @@ int main (int argc, char *argv[]) {
 		
 		if(inBlockOfSequence){
 
-		    cout<<"locus"<<++locusNumber<<" "<<(mp.getPopulationsNames()->size()-2)<<" "<<sequencesToPrint[0].size()<<endl;
-		    for(unsigned int p=2;p<mp.getPopulationsNames()->size();p++){
-			cout<<mp.getPopulationsNames()->at(p)<<"\t"<<sequencesToPrint[p-2]<<endl;
+		    cout<<"locus"<<++locusNumber<<" "<<(mp.getPopulationsNames()->size()-1)<<" "<<sequencesToPrint[0].size()<<endl;
+		    for(unsigned int p=0;p<mp.getPopulationsNames()->size();p++){
+			if(p==1) continue;
+			
+			if(p==0)
+			    cout<<mp.getPopulationsNames()->at(p)<<"\t"<<sequencesToPrint[p  ]<<endl;
+			else
+			    cout<<mp.getPopulationsNames()->at(p)<<"\t"<<sequencesToPrint[p-1]<<endl;
 		    }
 		    cout<<endl;
 
