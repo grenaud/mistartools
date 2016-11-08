@@ -5,11 +5,17 @@ library("gplots");
 library("reshape2");
 
 args=(commandArgs(TRUE))
-#paircoacompute2barplot [dstat file] [sample source] [pdf out prefix]
+#paircoacompute2barplot [dstat file] [sample source] [pdf out prefix] [pdf size]
+#write 10 as size to start with
 
 #print("reading data");
 data <- read.table(args[1],header=FALSE);
 #print("individuals found");
+t1<-gsub("-([0-9][0-9]?)$","_\\1",data$V1)
+t2<-gsub("-([0-9][0-9]?)@","_\\1@",t1)
+t3<-sub("-([0-9][0-9]?)-","_\\1-",t2)
+
+data$V1<-t3
 
 l<- unlist(  strsplit(  as.character( unlist(strsplit( as.character(data$V1) , c("-") )) ), c("@")) )
 
@@ -51,7 +57,7 @@ my_palette <- colorRampPalette(c("red", "yellow", "green"))(n = 299)
 
 #val[lower.tri(val)] <- NA
 
-pdf(paste(args[3],"heat.pdf",sep=""),width = 10, height = 10)
+pdf(paste(args[3],"heat.pdf",sep=""),width = as.integer(args[4]), height = as.integer(args[4]))
 #png("filename.png",width=2000,height=800)
 #pdf("filename.pdf",width=24,height=8)
 
@@ -73,13 +79,13 @@ p<-heatmap.2(val,
 dev.off();
 
 
-pdf(paste(args[3],"reorderheat.pdf",sep=""),width = 10, height = 10)
+pdf(paste(args[3],"reorderheat.pdf",sep=""),width = as.integer(args[4]), height = as.integer(args[4]))
 #png("filename.png",width=2000,height=800)
 #pdf("filename.pdf",width=24,height=8)
 
 p<-heatmap.2(val,
   cellnote = val,  # same data set for cell labels
-  main = paste("Pairwise coalescence using source ",args[2],sep=""), # heat map title
+  main = paste("Dstatistics using source ",args[2],sep=""), # heat map title
   notecol="black",      # change font color of cell labels to black
   density.info="none",  # turns off density plot inside color legend
   trace="none",         # turns off trace lines inside the heat map
