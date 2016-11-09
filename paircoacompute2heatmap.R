@@ -8,6 +8,18 @@ args=(commandArgs(TRUE))
 #paircoacompute2barplot [mst file] [samples to include, comma delim] [pdf out prefix]
 
 data <- read.table(args[1],header=FALSE);
+t1<-gsub("-([0-9][0-9]?)$","_\\1",data$V1)
+t2<-sub("-([0-9][0-9]?)-","_\\1-",t1)
+
+data$V1<-t2
+vectorinString<-(strsplit( args[2]  , "," )[[1]]);
+t1<-gsub("-([0-9][0-9]?)$","_\\1",vectorinString);
+vectorinString<-paste(t1,collapse=",");
+
+vectoroutString<-(strsplit( args[3]  , "," )[[1]]);
+t1<-gsub("-([0-9][0-9]?)$","_\\1",vectoroutString);
+vectoroutString<-paste(t1,collapse=",");
+
 
 ind1<-unlist(strsplit( as.character(data$V1) , "-" ))[c(TRUE, FALSE)]
 ind2<-unlist(strsplit( as.character(data$V1) , "-" ))[c(FALSE,TRUE) ]
@@ -34,7 +46,7 @@ dat<-dat[vectorin  , ]
 
 vectorin<-rep(FALSE,length(dat$V1));
 
-for(indinc in  strsplit( args[2]     , "," )[[1]]){
+for(indinc in  strsplit( vectorinString    , "," )[[1]]){
     print(indinc)
     vectorin <- vectorin | dat$V2==indinc;
 }
@@ -60,7 +72,7 @@ my_palette <- colorRampPalette(c("red", "yellow", "green"))(n = 299)
 
 
 
-pdf(paste(args[3],"heat.pdf",sep=""),width = 10, height = 10)
+pdf(paste(args[3],"heat.pdf",sep=""),width = 15, height = 15)
 #png("filename.png",width=2000,height=800)
 #pdf("filename.pdf",width=24,height=8)
 
@@ -82,7 +94,7 @@ p<-heatmap.2(val,
 dev.off();
 
 
-pdf(paste(args[3],"reorderheat.pdf",sep=""),width = 10, height = 10)
+pdf(paste(args[3],"reorderheat.pdf",sep=""),width = 15, height = 15)
 #png("filename.png",width=2000,height=800)
 #pdf("filename.pdf",width=24,height=8)
 
