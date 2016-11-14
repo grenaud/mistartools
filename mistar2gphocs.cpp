@@ -18,20 +18,38 @@
 using namespace std;
 
 int main (int argc, char *argv[]) {
-    string usage=string("\t")+string(argv[0])+"  [mistar file] [bedfile]\n\n"
+    bool allowCpg=false;
+    
+    string usage=string("\t")+string(argv[0])+"  <options>  [mistar file] [bedfile]\n\n"
 			"\tThis program produces gPhocs sequence input from the regions defined in the bedfile.\n"+
-			"\tWARNING: Use preferably the wrapper mistar2gphocsWrapper.pl because it computes\n"+
+                	"\tOptions:\n"+
+                  	"\t\t--allowCpg\t\tOnly allow transversions (Default "+boolStringify(allowCpg)+" )\n"+
+           
+                	"\tWARNING: Use preferably the wrapper mistar2gphocsWrapper.pl because it computes\n"+
 			"\tthe bed regions the puts the # of records in the header\n"+
 	"";
 
      
-    if(argc != 3 ||
+    if(argc == 1 ||
        (argc == 2 && (string(argv[1]) == "-h" || string(argv[1]) == "--help") )
        ){
 	cerr << "Usage "<<usage<<endl;
 	return 1;       
     }
 
+    for(int i=1;i<(argc-2);i++){ 
+        
+        if( string(argv[i]) == "--allowCpg"  ){
+            allowCpg=true;
+            continue;
+        }
+
+        cerr<<"Error unknown option "<<argv[i]<<endl;
+        exit(1);
+    }
+
+
+    
     string bedFileRegions = string(argv[argc-1]);
     map< string, vector<GenomicRange> * > * bedRegionsToFilter;
     bedRegionsToFilter = readBEDSortedfile(bedFileRegions);
@@ -122,6 +140,7 @@ int main (int argc, char *argv[]) {
 		if(inBlockOfSequence){
 		    //flushing
 		    cout<<"locus"<<++locusNumber<<" "<<(mp.getPopulationsNames()->size()-1)<<" "<<sequencesToPrint[0].size()<<endl;//minus anc
+		    
 		    for(unsigned int p=0;p<mp.getPopulationsNames()->size();p++){
 			if(p==1) continue;//no anc
 			if(p==0) 
@@ -229,69 +248,90 @@ int main (int argc, char *argv[]) {
 		previousCoordinatePrinted = dataRow->coordinate;
 		chrPrinted                = dataRow->chr;
 
-		for(unsigned j=0;j<dataRow->vectorAlleles->size();j++){
-		    if(j==1) continue;
-
-		    //undefined site
-		    if( (dataRow->vectorAlleles->at(j).getRefCount() + dataRow->vectorAlleles->at(j).getAltCount()) > 2) {
-			cerr<<"ERROR: population "<<j<<" has more than 2 alleles at coordinate "<<dataRow->chr<<":"<<dataRow->coordinate<<endl;
-			exit(1);
+		bool isCpg=false;
+		if(!allowCpg){
+		    for(unsigned j=0;j<dataRow->vectorAlleles->size();j++){
+			isCpg = isCpg || dataRow->vectorAlleles->at(j).getIsCpg();
 		    }
+		}
 
-		    if( (dataRow->vectorAlleles->at(j).getRefCount() + dataRow->vectorAlleles->at(j).getAltCount()) != 2) {
-			if(j==0){//exception for the root, can be 1,0 or 0,1
-			    if( (dataRow->vectorAlleles->at(j).getRefCount() == 1) && (dataRow->vectorAlleles->at(j).getAltCount() == 0) ){ 
-				sequencesToPrint[j ] += refB;
-				continue;
-			    }
-			    
-			    if( (dataRow->vectorAlleles->at(j).getRefCount() == 0) && (dataRow->vectorAlleles->at(j).getAltCount() == 1) ){
-				sequencesToPrint[j ] += altB;
-				continue;
-			    }
-			    
+		if(isCpg){//mask CpG
+		    
+		    for(unsigned j=0;j<dataRow->vectorAlleles->size();j++){
+			if(j==1) continue;		       
+			if(j==0){//exception for the root, can be 1,0 or 0,1			    
 			    sequencesToPrint[j ] += "N";			    
 			}else{
 			    sequencesToPrint[j-1] += "N";
 			}
-			continue;
+			continue;			
 		    }
-		    //cout<<"add2 "<<sequencesToPrint[j-2]<<" "<<refB<<endl;
 		    
-		    //homo ref
-		    if( (dataRow->vectorAlleles->at(j).getRefCount() == 2) && 
-			(dataRow->vectorAlleles->at(j).getAltCount() == 0) ){
-			if(j==0)
-			    sequencesToPrint[j  ] += refB;
-			else
-			    sequencesToPrint[j-1] += refB;
-			continue;
-		    }
-		    //cout<<"add3 "<<sequencesToPrint[j-2]<<" "<<hetB<<endl;
-
-		    //het ref+alt
-		    if( (dataRow->vectorAlleles->at(j).getRefCount() == 1) && 
-			(dataRow->vectorAlleles->at(j).getAltCount() == 1) ){
-			if(j==0)
-			    sequencesToPrint[j  ] += hetB;
-			else
-			    sequencesToPrint[j-1] += hetB;
-			continue;
-		    }
-		    //cout<<"add4 "<<sequencesToPrint[j-2]<<" "<<altB<<endl;
-		    //homo alt
-		    if( (dataRow->vectorAlleles->at(j).getRefCount() == 0) && 
-			(dataRow->vectorAlleles->at(j).getAltCount() == 2) ){
-			if(j==0)
-			    sequencesToPrint[j  ] += altB;
-			else
-			    sequencesToPrint[j-1] += altB;
-			continue;
-		    }
-
-		}//end each data row
+		}else{
 		
+		    for(unsigned j=0;j<dataRow->vectorAlleles->size();j++){
+			if(j==1) continue;
 
+			//undefined site
+			if( (dataRow->vectorAlleles->at(j).getRefCount() + dataRow->vectorAlleles->at(j).getAltCount()) > 2) {
+			    cerr<<"ERROR: population "<<j<<" has more than 2 alleles at coordinate "<<dataRow->chr<<":"<<dataRow->coordinate<<endl;
+			    exit(1);
+			}
+
+			if( (dataRow->vectorAlleles->at(j).getRefCount() + dataRow->vectorAlleles->at(j).getAltCount()) != 2) {
+			    if(j==0){//exception for the root, can be 1,0 or 0,1
+				if( (dataRow->vectorAlleles->at(j).getRefCount() == 1) && (dataRow->vectorAlleles->at(j).getAltCount() == 0) ){ 
+				    sequencesToPrint[j ] += refB;
+				    continue;
+				}
+			    
+				if( (dataRow->vectorAlleles->at(j).getRefCount() == 0) && (dataRow->vectorAlleles->at(j).getAltCount() == 1) ){
+				    sequencesToPrint[j ] += altB;
+				    continue;
+				}
+			    
+				sequencesToPrint[j ] += "N";			    
+			    }else{
+				sequencesToPrint[j-1] += "N";
+			    }
+			    continue;
+			}
+			//cout<<"add2 "<<sequencesToPrint[j-2]<<" "<<refB<<endl;
+		    
+			//homo ref
+			if( (dataRow->vectorAlleles->at(j).getRefCount() == 2) && 
+			    (dataRow->vectorAlleles->at(j).getAltCount() == 0) ){
+			    if(j==0)
+				sequencesToPrint[j  ] += refB;
+			    else
+				sequencesToPrint[j-1] += refB;
+			    continue;
+			}
+			//cout<<"add3 "<<sequencesToPrint[j-2]<<" "<<hetB<<endl;
+
+			//het ref+alt
+			if( (dataRow->vectorAlleles->at(j).getRefCount() == 1) && 
+			    (dataRow->vectorAlleles->at(j).getAltCount() == 1) ){
+			    if(j==0)
+				sequencesToPrint[j  ] += hetB;
+			    else
+				sequencesToPrint[j-1] += hetB;
+			    continue;
+			}
+			//cout<<"add4 "<<sequencesToPrint[j-2]<<" "<<altB<<endl;
+			//homo alt
+			if( (dataRow->vectorAlleles->at(j).getRefCount() == 0) && 
+			    (dataRow->vectorAlleles->at(j).getAltCount() == 2) ){
+			    if(j==0)
+				sequencesToPrint[j  ] += altB;
+			    else
+				sequencesToPrint[j-1] += altB;
+			    continue;
+			}
+
+		    }//end each data row
+		
+		}
 		    
 
 	 

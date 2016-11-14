@@ -7,6 +7,7 @@ use Getopt::Long;
 use Cwd 'abs_path';
 
 my $mock=0;
+#my $noo=0;
 
 sub runcmd{
   my ($cmdtorun) = @_;
@@ -44,7 +45,8 @@ sub fileExists{
 
 my $lengthmerge =0;
 my $minlength   =1000;
-my $outputf   ="none";
+my $outputf     ="none";
+my $allowCpg    = 0;
 
 my $help;
 
@@ -64,6 +66,7 @@ sub usage
   "\t-l [X bp]\t\t\t\tConsider overlap between regions if they are Xbp away (default ".$lengthmerge." bp)\n".
   "\t-m [X bp]\t\t\t\tOnly print regions longer than Xbp away (default ".$minlength." bp)\n".
   "\t-o [output]\t\t\t\tOutput file (default: ".$outputf.")\n".
+  "\t--allowCpg [output]\t\t\t\tDo not mask CpGs (default: ".$outputf.")\n".
 
     "\n\n";
   die;
@@ -73,7 +76,7 @@ sub usage
 
 
  usage() if ( @ARGV < 1 or
-             ! GetOptions('help|?' => \$help, 'mock' => \$mock, 'l=i' => \$lengthmerge, 'm=i' => \$minlength,'o=s' => \$outputf)
+             ! GetOptions('help|?' => \$help, 'mock' => \$mock, 'allowCpg' => \$allowCpg, 'l=i' => \$lengthmerge, 'm=i' => \$minlength,'o=s' => \$outputf)
           or defined $help );
 
 if($outputf eq "none"){
@@ -132,7 +135,12 @@ runcmd($cmd);
 #running mistar2phocs
 my $outputftemp=$outputf."_";
 
-$cmd = $mistar2gphocs ."  ".$inputMSTfile." <(zcat $outputftempBED) > ".$outputftemp;
+$cmd = $mistar2gphocs;
+if($allowCpg){
+  $cmd = $cmd." --allowCpg ";
+}
+
+$cmd = $cmd."  ".$inputMSTfile." <(zcat $outputftempBED) > ".$outputftemp;
 runcmd($cmd);
 
 

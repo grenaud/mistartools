@@ -248,7 +248,14 @@ foreach my $chr (@humanchr){
   push(@arrayDeleteIntermediate, $outprefix."_".$chr.".mst.gz.tbi");
 
 
-  my $cmd = $mistarintersect." ";
+  my $cmd;
+  if($#filesToAnalyze == 0){
+    $cmd = "cat ";
+  }else{
+    $cmd = $mistarintersect." ";
+  }
+
+
   foreach my $rec (@filesToAnalyze){
     if($rec->[1] eq ""){
       $cmd = $cmd. " <(".$tabixcmd." -h ".$rec->[0]." ".$chr." ) ";
