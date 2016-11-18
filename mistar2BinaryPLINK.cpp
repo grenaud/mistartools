@@ -88,38 +88,62 @@ int main (int argc, char *argv[]) {
     while(mp.hasData()){
 	record = mp.getData();
 	
-	if(!isResolvedDNA(record->alt))
+	if(!isResolvedDNA(record->alt))//skip non-seg sites
 	    continue;
 
-	bimFileS<<record->chr<<"\t"<<"snp#"<<(counter++)<<"\t"<<stringify(double(record->coordinate)/double(1000000))<<"\t"<<stringify(record->coordinate)<<"\t"<<record->ref<<"\t"<<record->alt<<endl;
-	
 	unsigned int firstIndex=0;
 	if(!printRoot)
 	    firstIndex=2;
+
+
+	if(!printRoot){
+	    unsigned int refSum=0;
+	    unsigned int altSum=0;
+	    
+	    
+	    for(unsigned int i=firstIndex;i<record->vectorAlleles->size();i++){
+		refSum+=record->vectorAlleles->at(i).getRefCount() ;
+		altSum+=record->vectorAlleles->at(i).getAltCount() ;		
+	    }
+
+	    if( (altSum==0) || (refSum==0) )//skip non-seg sites in all but the root/anc
+		continue;
+
+	    
+	}
+	    
+	
+	bimFileS<<record->chr<<"\t"<<"snp#"<<(counter++)<<"\t"<<stringify(double(record->coordinate)/double(1000000))<<"\t"<<stringify(record->coordinate)<<"\t"<<record->ref<<"\t"<<record->alt<<endl;
+	
 	
 
-	char byteToWrite=0;
-	int storedInByte=0;
+	char byteToWrite=0; //data to write
+	int storedInByte=0; //how much data is there in byteToWrite
+	
 	for(unsigned int i=firstIndex;i<record->vectorAlleles->size();i++){	    
-	    char   toStore = record->vectorAlleles->at(i).printPLINK();	   
-	    if( (i%4) == 3){//to write
-		byteToWrite |= (  toStore<< ((i%4)*2) );		
-		// cout<<"1: "<<var2binary(byteToWrite)<<endl;
+
+	    char   toStore = record->vectorAlleles->at(i).printBinaryPLINK();
+	    //cout<<i<<" "<<var2binary(toStore)<<endl;
+	    if( (storedInByte%4) == 3){//to write
+		byteToWrite |= (  toStore<< ((storedInByte%4)*2) );		
+		//cout<<"snp# "<<(counter-1)<<" "<<var2binary(byteToWrite)<<endl;
 		bedFileS.write( (char *)&byteToWrite, sizeof(byteToWrite));		
 		byteToWrite  = 0;
 		storedInByte = 0;
 	    }else{
-		byteToWrite |= (  toStore<< ((i%4)*2) );
+		byteToWrite |= (  toStore<< ((storedInByte%4)*2) );
 		storedInByte++;
 	    }
-	} 
+	    
+	}
 
 	if(storedInByte!=0){
+	    //cout<<"padpre snp "<<(counter-1)<<" "<<var2binary(byteToWrite)<<endl;  
 	    for(int k=3;k>=storedInByte;k--){
 		char zeroC= 3; //missing data
 		byteToWrite |= (  zeroC << ((k%4)*2) );		
 	    }
-	    // cout<<"1: "<<var2binary(byteToWrite)<<endl;  
+	    //cout<<"padpos snp "<<(counter-1)<<" "<<var2binary(byteToWrite)<<endl;  
 	    bedFileS.write( (char *)&byteToWrite, sizeof(byteToWrite));		
 	}
 	

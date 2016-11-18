@@ -37,8 +37,10 @@ public:
     char generateRandomAlleleBias(const char ref,const char alt);
     char generateRandomAllele(const char ref,const char alt);
 
-    int    printEIGENSTRAT();
+    int   printEIGENSTRAT();
     char  printPLINK();
+    char  printBinaryPLINK();
+
 
     void setRefCount(int refCount);
     void setAltCount(int altCount);

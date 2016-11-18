@@ -200,6 +200,46 @@ char  SingleAllele::printPLINK(){
     return 3;
 }
 
+//like PLINK but the bits are flipped
+char  SingleAllele::printBinaryPLINK(){
+    if(refCount == 2 && altCount == 0) //homo ref
+	return 0; //00
+
+    if(refCount == 1 && altCount == 1) //hetero	
+	return 2; //10
+
+    if(refCount == 0 && altCount == 2) //homo alt
+	return 3; //11
+    
+    if( (refCount == 0 && altCount == 1) ){ //has at least one alt, wrong but we will have to use it
+	return 3; //11	
+    }
+
+    if( (refCount == 1 && altCount == 0) ){ //has at least one ref, wrong but we will have to use it
+	return 0; //00
+    }
+    
+    if( (refCount == 0 && altCount == 0) ) //unknown
+	return 1; //01
+
+
+    //If we reached this position, this means we deal with population allele frequency
+    //try to generate something random for populations
+    int randIndex1=rand()%totalCount;//returns a number between 0 and (totalCount-1)
+    //int randIndex2=rand()%totalCount;//returns a number between 0 and (totalCount-1)
+    bool ref1 = (randIndex1<refCount);
+    bool ref2 = (randIndex1<refCount);
+
+    if(ref1 && ref2 ) //homo ref
+	return 0;//00
+    
+    
+    if(!ref1 && !ref2 ) //homo alt
+	return 3;//11
+    
+    return 3;//11
+}
+
 char SingleAllele::generateRandomAlleleBias(const char ref,const char alt){
     if(totalCount==0){
 	// cerr<<"SingleAllele: cannot call generateRandomAlleleBias() where the allele count is 0 :"<<*this<<endl;
