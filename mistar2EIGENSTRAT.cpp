@@ -79,6 +79,9 @@ int main (int argc, char *argv[]) {
 	if(!isResolvedDNA(record->alt))
 	    continue;
 
+	if( (counter%1000000) ){
+	    cerr<<"Produced "<<counter<<" sites at "<<record->chr<<":"<<record->coordinate<<endl;
+	}
 	snpFileS<<"snp#"<<(counter++)<<"\t"<<record->chr<<"\t"<<stringify(double(record->coordinate)/double(1000000))<<"\t"<<stringify(record->coordinate)<<"\t"<<record->ref<<"\t"<<record->alt<<endl;
 	
 	unsigned int firstIndex=0;
