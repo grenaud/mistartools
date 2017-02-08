@@ -15,12 +15,15 @@ using namespace std;
 
 int main (int argc, char *argv[]) {
 
-    bool printRoot=false;
+    bool printRoot = false;
+    bool printAnc  = false;
 
     string usage=string(""+string(argv[0])+" <options> [mistar file] [out genotype file (.geno)] [out SNP file (.snp)] [out SNP file (.ind)] "+
 			"\n\nThis program takes a mistar matrix and prints the genotype and SNP file\n\n"+
 			"\tOptions\n"+			
-			"\t\t"+"--withanc"+"\t"+"Print the root/anc (Default: "+boolStringify(printRoot)+" )\n"
+			"\t\t"+"--withroot"+"\t"+"Print the root (Default: "+boolStringify(printRoot)+" )\n"
+			"\t\t"+"--withanc"+"\t"+"Print the anc (Default: "+boolStringify(printAnc)+" )\n"
+			
 			);
 
     if(argc < 4 ||
@@ -33,8 +36,12 @@ int main (int argc, char *argv[]) {
     //all but last 4
     for(int i=0;i<(argc-4);i++){ 
 
-	if( string(argv[i]) == "--withanc"){
+	if( string(argv[i]) == "--withroot"){
 	    printRoot=true;
+	}
+
+	if( string(argv[i]) == "--withanc"){
+	    printAnc=true;
 	}
 
     }
@@ -62,9 +69,17 @@ int main (int argc, char *argv[]) {
 
     AlleleRecords * record;
  
-    unsigned int firstIndex=0;
-    if(!printRoot)
-	firstIndex=2;
+
+    if(printRoot){
+	indFileS<<mp.getPopulationsNames()->at(0)<<"\tU\t"<<mp.getPopulationsNames()->at(0)<<endl;
+    }
+    
+    if(printAnc){
+	indFileS<<mp.getPopulationsNames()->at(1)<<"\tU\t"<<mp.getPopulationsNames()->at(1)<<endl;
+    }
+
+    
+    unsigned int firstIndex=2;
     for(unsigned int i=firstIndex;i<mp.getPopulationsNames()->size();i++){
 	indFileS<<mp.getPopulationsNames()->at(i)<<"\tU\t"<<mp.getPopulationsNames()->at(i)<<endl;
 	
@@ -84,13 +99,20 @@ int main (int argc, char *argv[]) {
 	}
 	snpFileS<<"snp#"<<(counter++)<<"\t"<<record->chr<<"\t"<<stringify(double(record->coordinate)/double(1000000))<<"\t"<<stringify(record->coordinate)<<"\t"<<record->ref<<"\t"<<record->alt<<endl;
 	
-	unsigned int firstIndex=0;
-	if(!printRoot)
-	    firstIndex=2;
+	if(printRoot){
+	    genoFileS<<record->vectorAlleles->at(0).printEIGENSTRAT();	   
+	}
+
+	if(printAnc){
+	    genoFileS<<record->vectorAlleles->at(1).printEIGENSTRAT();	   
+	}
+	
+	unsigned int firstIndex=2;
 
 	for(unsigned int i=firstIndex;i<record->vectorAlleles->size();i++){
 	    genoFileS<<record->vectorAlleles->at(i).printEIGENSTRAT();	   
-	} 
+	}
+	
 	genoFileS<<endl;
 
     }

@@ -23,7 +23,7 @@ int main (int argc, char *argv[]) {
     string usage=string("\t")+string(argv[0])+"  <options>  [mistar file] [bedfile]\n\n"
 			"\tThis program produces gPhocs sequence input from the regions defined in the bedfile.\n"+
                 	"\tOptions:\n"+
-                  	"\t\t--allowCpg\t\tOnly allow transversions (Default "+boolStringify(allowCpg)+" )\n"+
+                  	"\t\t--allowCpg\t\tAllow CpG sites (Default "+boolStringify(allowCpg)+" )\n"+
            
                 	"\tWARNING: Use preferably the wrapper mistar2gphocsWrapper.pl because it computes\n"+
 			"\tthe bed regions the puts the # of records in the header\n"+
