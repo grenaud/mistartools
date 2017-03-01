@@ -195,7 +195,7 @@ while(my $line = <FILE>){
   chomp($line);
   #print $line."\n";
   if($line =~ /^(\S+)\s+(\S+)$/){
-    print $1."\t".$2."\n";
+    warn $1."\t".$2."\n";
     if(exists $hashPop2Ind{$2}){
       push(@{$hashPop2Ind{$2}},$1);
     }else{
