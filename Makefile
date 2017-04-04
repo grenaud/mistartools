@@ -8,7 +8,7 @@ BAMTOOLS = bamtools/
 LDFLAGS  =   ReadTabix.o  tabix/libtabix.a     -lz -lpthread #/usr/lib/libarmadillo.so
 CXXFLAGS = -Wall -lm -O3 -lz -I${LIBGAB}/   -I${LIBTABIX}   -I${LIBGAB}/gzstream/  -I${BAMTOOLS}/include/  -I${BAMTOOLS}/src/  -c
 
-all: tabix/libtabix.a bamtools/lib/libbamtools.a libgab/utils.o ReadTabix.o testNewickParser boostrapSubGroups mistar2treemix mistarcompute mistarcat  mistarintersect mistarmeld mistarunion testMistar mistarfilter mistar2AlleleMatrix epo2mistar mistaruniq ms2nj mistar2binary closestMistar replaceAncestor mistar2nexus ms2mistar mistar2bed mistarfreqSpec  testMistarTabix mistarcompress mistardecompress mpileup2mistar mistar2EIGENSTRAT mistar2BinaryPLINK mistar2segtor mistar2fasta mistarRenamePop usePopAsRootAnc mistarstats axt2mistar mistarSubsample bam2mistar bam2mistarNoEpo vcfcompute testRandomCoordGenerator testComputation generateCoords testMS avgCoaMS testReadTabix testVCF mergeBAMTable filterVCF testReadFastq vcf2mistar bamtable2mistar 23andme2mistar testMultiReadTabix vcfMulti2mistar mistarcomputeParallel vcf2mistarNoEpo mistar2gphocs
+all: tabix/libtabix.a bamtools/lib/libbamtools.a libgab/utils.o ReadTabix.o testNewickParser boostrapSubGroups mistar2treemix mistarcompute mistarcat  mistarintersect mistarmeld mistarunion testMistar mistarfilter mistar2AlleleMatrix mistar2vcf epo2mistar mistaruniq ms2nj mistar2binary closestMistar replaceAncestor mistar2nexus ms2mistar mistar2bed mistarfreqSpec  testMistarTabix mistarcompress mistardecompress mpileup2mistar mistar2EIGENSTRAT mistar2BinaryPLINK mistar2segtor mistar2fasta mistarRenamePop usePopAsRootAnc mistarstats axt2mistar mistarSubsample bam2mistar bam2mistarNoEpo vcfcompute testRandomCoordGenerator testComputation generateCoords testMS avgCoaMS testReadTabix testVCF mergeBAMTable filterVCF testReadFastq vcf2mistar bamtable2mistar 23andme2mistar testMultiReadTabix vcfMulti2mistar mistarcomputeParallel vcf2mistarNoEpo mistar2gphocs
 
 
 %.o: %.cpp
@@ -180,6 +180,9 @@ epo2mistar:	epo2mistar.o libgab/utils.o   MistarParser.o libgab//gzstream/libgzs
 mistar2AlleleMatrix:	mistar2AlleleMatrix.o   MistarParser.o libgab/utils.o  libgab//gzstream/libgzstream.a  SingleAllele.o AlleleRecords.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS)
 
+mistar2vcf:	mistar2vcf.o   MistarParser.o libgab/utils.o  libgab//gzstream/libgzstream.a  SingleAllele.o AlleleRecords.o
+	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS)
+
 mistar2fasta:	mistar2fasta.o libgab/utils.o  MistarParser.o libgab//gzstream/libgzstream.a  SingleAllele.o AlleleRecords.o
 	${CXX} -o $@ $^ $(LDLIBS) $(LDFLAGS)
 
@@ -229,5 +232,5 @@ bamtable2mistar:	bamtable2mistar.o libgab/utils.o   tabix/libtabix.a   BAMTableO
 
 
 clean :
-	rm -f  *.o  testNewickParser boostrapSubGroups mistar2treemix mistarcompute mistarcat  mistarintersect mistarmeld mistarunion testMistar mistarfilter mistar2AlleleMatrix epo2mistar mistaruniq ms2nj mistar2binary closestMistar replaceAncestor mistar2nexus ms2mistar mistar2bed mistarfreqSpec  testMistarTabix mistarcompress mistardecompress mpileup2mistar mistar2EIGENSTRAT mistar2BinaryPLINK mistar2segtor mistar2fasta mistarRenamePop usePopAsRootAnc mistarstats axt2mistar mistarSubsample bam2mistar bam2mistarNoEpo vcfcompute testRandomCoordGenerator testComputation generateCoords testMS avgCoaMS testReadTabix testVCF mergeBAMTable filterVCF testReadFastq vcf2mistar bamtable2mistar 23andme2mistar testMultiReadTabix vcfMulti2mistar mistarcomputeParallel vcf2mistarNoEpo mistar2gphocs
+	rm -f  *.o  testNewickParser boostrapSubGroups mistar2treemix mistarcompute mistarcat  mistarintersect mistarmeld mistarunion testMistar mistarfilter mistar2AlleleMatrix mistar2vcf epo2mistar mistaruniq ms2nj mistar2binary closestMistar replaceAncestor mistar2nexus ms2mistar mistar2bed mistarfreqSpec  testMistarTabix mistarcompress mistardecompress mpileup2mistar mistar2EIGENSTRAT mistar2BinaryPLINK mistar2segtor mistar2fasta mistarRenamePop usePopAsRootAnc mistarstats axt2mistar mistarSubsample bam2mistar bam2mistarNoEpo vcfcompute testRandomCoordGenerator testComputation generateCoords testMS avgCoaMS testReadTabix testVCF mergeBAMTable filterVCF testReadFastq vcf2mistar bamtable2mistar 23andme2mistar testMultiReadTabix vcfMulti2mistar mistarcomputeParallel vcf2mistarNoEpo mistar2gphocs
 

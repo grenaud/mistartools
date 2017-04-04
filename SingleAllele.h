@@ -34,8 +34,9 @@ public:
 
     bool isHeterozygous();
     bool   getIsCpg();
-    char generateRandomAlleleBias(const char ref,const char alt);
+    char generateRandomAlleleBias(const char ref,const char alt);    
     char generateRandomAllele(const char ref,const char alt);
+    string generateVCFAllele(const char ref,const char alt);    
 
     int   printEIGENSTRAT();
     char  printPLINK();

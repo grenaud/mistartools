@@ -247,13 +247,32 @@ char SingleAllele::generateRandomAlleleBias(const char ref,const char alt){
 	return 'N';
     }
     int randIndex=rand()%totalCount;//returns a number between 0 and (totalCount-1)
-
     if(randIndex<refCount){
 	return ref;
     }else{
 	return alt;
     }
+}
 
+
+string SingleAllele::generateVCFAllele(const char ref,const char alt){
+    if(totalCount != 2){
+	return "./.";
+    }
+    
+    if(refCount == 2){
+	return "0/0";
+    }else{
+	if(altCount == 2){
+	    return "1/1";
+	}else{
+	    if(refCount == 1 && altCount == 1){
+		return "0/1";
+	    }else{
+		cerr<<"ERROR, cannot format the following record to VCF "<<*this<<endl;
+	    }
+	}
+    }    
 }
 
 char SingleAllele::generateRandomAllele(const char ref,const char alt){
