@@ -83,6 +83,17 @@ string GenomicRange::asBed() const {
     return ""+chrName+"\t"+stringify(startCoord-1)+"\t"+stringify(endCoord);
 }
 
+bool GenomicRange::isContained(string chrName_,unsigned int coord_) const{;
+    if(chrName_ != chrName)
+	return false;
+
+    if(coord_<startCoord)
+	return false;
+    if(coord_>endCoord)
+	return false;
+
+    return true;
+}
 
 std::ostream & operator << (std::ostream & os, const GenomicRange & ct){
     os<<ct.chrName<<":"

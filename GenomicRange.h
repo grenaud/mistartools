@@ -40,6 +40,8 @@ public:
 
     unsigned int getLength() const;
 
+    bool isContained(string chrName_,unsigned int coord_) const;
+	
 
     friend std::ostream & operator<<(std::ostream & os, const GenomicRange & ct);
 
